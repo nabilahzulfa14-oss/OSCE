@@ -2593,4 +2593,12 @@ function renderCatalog(){
 $('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
 renderCatalog();
 
+// Deep link langsung ke modul yang diminta
+const pageParams = new URLSearchParams(window.location.search);
+if (pageParams.get('stase') === 'Integumen') {
+  setMode('study');
+  $('studySpec').value = 'Integumen';
+  renderStudyList();
+}
+
 </script></body></html>
