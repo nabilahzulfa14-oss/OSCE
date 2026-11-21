@@ -50,7 +50,7 @@ button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;pad
 <div class="dashselect hidden" id="practicePanel">
   <div class="topline"><div><h2>Pilih stase latihan</h2> </div><button class="secondary" id="backModesPractice">← Pilih mode</button></div><div class="muted">Pilih stase dan level. Sistem akan mengacak satu kasus yang tersedia.</div>
   <div class="startrow">
-   <div class="field"><label>Stase</label><select id="dashSpec"><option value="all">Semua stase</option><option value="Interna">Penyakit Dalam</option><option value="Cardio">Kardiovaskular</option><option value="Respirasi">Respirasi</option><option value="Bedah">Bedah</option><option value="Anak">Ilmu Kesehatan Anak</option><option value="Neuro">Neurologi</option><option value="Kulit">Kulit dan Kelamin</option><option value="Urologi">Urologi</option></select></div>
+   <div class="field"><label>Stase</label><select id="dashSpec"><option value="all">Semua sistem SKDI</option></select></div>
    <div class="field"><label>Level kompetensi</label><select id="dashLevel"><option value="all">Semua level</option><option>4A</option><option>3A</option><option>3B</option></select></div>
    <div class="field"><label>Mode latihan</label><select id="dashMode"><option value="random">Random — tanpa petunjuk</option><option value="study">Belajar — pembahasan setelah selesai</option></select></div>
    <button id="startRandom" class="teal">Mulai stasiun acak →</button>
@@ -580,6 +580,8 @@ const diseaseBank = [
 ["Forensik","Kematian mendadak","3B"],
 ["Forensik","Toksikologi forensik","3A"]
 ].map(([spec,name,level])=>({spec,name,level}));
+$('dashSpec').insertAdjacentHTML('beforeend',[...new Set(diseaseBank.map(d=>d.spec))].sort().map(x=>'<option value="'+x+'">'+x+'</option>').join(''));
+
 
 function updateAvailable(){
  const sp=$('dashSpec').value,lv=$('dashLevel').value;
