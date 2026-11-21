@@ -110,7 +110,7 @@ function tick(){if(!paused&&seconds>0){seconds--;showTime()}else if(seconds===0)
 $('pauseTimer').onclick=()=>{if(seconds===0)return;paused=!paused;$('pauseTimer').textContent=paused?'Lanjutkan':'Pause'};
 $('resetTimer').onclick=()=>{seconds=720;paused=false;$('pauseTimer').textContent='Pause';showTime()};
 $('levelFilter').onchange=renderList;$('specFilter').onchange=renderList;
-clock=setInterval(tick,1000);loadCase(cases[0]);
+clock=setInterval(tick,1000);
 
 const physicalByCase={
  stemi:{ku:'Tampak sakit berat, gelisah, diaforesis.',kesadaran:'Compos mentis.',ttv:'TD 90/60 mmHg; nadi 108 x/menit; RR 24 x/menit; SpO₂ 94%; suhu belum dicatat.',head:'Kepala normosefal; wajah tampak kesakitan.',eyes:'Konjungtiva tidak pucat; sklera tidak ikterik.',ent:'Tidak ada temuan khusus.',neck:'JVP dapat dinilai; tidak ada kaku kuduk.',thorax:'Gerak dada simetris.',cardio:'Suara jantung reguler; akral dingin.',resp:'Tidak terdengar ronki.',abd:'Belum ada temuan spesifik dalam skenario.',ext:'Akral dingin, berkeringat; evaluasi nadi perifer dan CRT.',neuro:'Kesadaran compos mentis; skrining defisit neurologis.'},
@@ -176,6 +176,7 @@ $('requestExam').onclick=()=>{
  else renderInvestigation(match[0],match[1]);
  $('proposedExam').value='';
 };
+loadCase(cases[0]);
 
 function updateAvailable(){
  const sp=$('dashSpec').value,lv=$('dashLevel').value;
