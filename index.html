@@ -858,43 +858,67 @@ function respiratoryKeyHtml(l){
 
 function diagnosticResultPanel(title,system){
  const t=String(title||'').toLowerCase();
- const panel=(rows,note='',img='')=>'<section class="study-points"><h3>📊 Contoh hasil pemeriksaan dan interpretasi</h3><p class="muted">Data berikut adalah simulasi untuk latihan OSCE, bukan hasil pasien nyata atau nilai rujukan universal.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Contoh hasil</th><th>Interpretasi</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'+(note?'<p>'+note+'</p>':'')+(img?'<div class="study-visual"><img loading="lazy" src="'+img.src+'" alt="'+img.alt+'" style="max-width:100%;height:auto"><p>'+img.alt+'</p><a href="'+img.url+'" target="_blank" rel="noopener">Sumber gambar dan penjelasan</a></div>':'')+'</section>';
- if(system==='Respirasi'){
-  if(/asma/.test(t))return panel([['Spirometri pra-bronkodilator','FEV₁ 2,10 L (68% prediksi); FVC 3,30 L (90%); FEV₁/FVC 0,64','Rasio di bawah LLN: pola obstruktif.'],['Pasca bronkodilator','FEV₁ 2,42 L; naik 320 mL (15% dari nilai awal)','Respons bronkodilator mendukung variabilitas hambatan aliran pada gejala khas asma.'],['PEF serial','Pagi 280 dan malam 390 L/menit','Variabilitas sekitar 33%; variasi berulang mendukung asma.'],['SpO₂','97% udara ruangan saat stabil','Tidak hipoksemia saat diukur; tidak menyingkirkan asma.']],'Gunakan LLN sesuai umur, jenis kelamin, tinggi badan dan persamaan referensi. Kriteria respons bronkodilator mengikuti standar/pedoman yang dipakai.',{src:'https://apps.uworld.com/media/L7317.png',alt:'Kurva flow-volume: pola obstruktif menunjukkan cekungan pada fase ekspirasi dibandingkan pola normal dan restriktif.',url:'https://medical.uworld.com/library/pulmonary-critical-care/439/pulmonary-function-testing/'});
-  if(/ppok|emfisema|bronkitis kronik/.test(t))return panel([['Spirometri pascabronkodilator','FEV₁ 1,35 L (48% prediksi); FVC 2,55 L; FEV₁/FVC 0,53','Rasio pascabronkodilator <0,70 mendukung obstruksi persisten pada konteks klinis PPOK.'],['Respons bronkodilator','FEV₁ naik 120 mL','Respons kecil; respons bronkodilator sendiri tidak membedakan PPOK dari asma.'],['SpO₂','91% udara ruangan','Perlu penilaian hipoksemia dan derajat eksaserbasi.'],['Foto toraks','Hiperinflasi dan diafragma mendatar','Dapat mendukung emfisema/hiperinflasi; bukan tes konfirmasi PPOK.']],'Diagnosis PPOK memerlukan spirometri pascabronkodilator dan konteks pajanan/gejala.',{src:'https://apps.uworld.com/media/L7317.png',alt:'Kurva flow-volume obstruktif dengan cekungan fase ekspirasi.',url:'https://medical.uworld.com/library/pulmonary-critical-care/439/pulmonary-function-testing/'});
-  if(/tuberkulosis|tb paru/.test(t))return panel([['Foto toraks PA','Infiltrat fibronodular dominan zona atas kanan ± kavitas','Mencurigakan TB paru; radiologi bukan konfirmasi tunggal.'],['TCM sputum','MTB detected; rifampisin resistance not detected','Mendeteksi kompleks MTB dan resistensi rifampisin.'],['Mikroskopis BTA','BTA 1+ (contoh bila positif)','Mendukung adanya basil tahan asam; hasil negatif tidak menyingkirkan TB.'],['Darah lengkap','Hb 11,8 g/dL; leukosit 8.900/µL','Tidak spesifik untuk TB.']],'Ikuti alur diagnosis TB nasional; utamakan pemeriksaan bakteriologis/molekuler untuk konfirmasi.');
-  if(/pneumonia/.test(t))return panel([['Foto toraks','Konsolidasi lobar kanan bawah dengan air bronchogram','Mendukung pneumonia bila sesuai gejala dan temuan fokal.'],['Darah lengkap','Leukosit 15.200/µL; neutrofil 86%','Leukositosis neutrofil dapat mendukung infeksi bakteri, tidak spesifik.'],['CRP','85 mg/L','Meningkat; marker inflamasi, bukan penentu etiologi.'],['SpO₂','92% udara ruangan','Saturasi rendah; nilai derajat berat dan kebutuhan oksigen.']]);
-  if(/bronkiektasis/.test(t))return panel([['HRCT toraks','Signet-ring sign; bronkus tidak mengecil ke perifer','Mendukung bronkiektasis.'],['Kultur sputum','Contoh: Pseudomonas aeruginosa tumbuh','Membantu pemilihan antibiotik saat eksaserbasi sesuai klinis.'],['Spirometri','Dapat menunjukkan FEV₁/FVC menurun','Menilai gangguan ventilasi, bukan konfirmasi bronkiektasis.']]);
-  if(/efusi pleura/.test(t))return panel([['Foto toraks','Sudut kostofrenikus tumpul, opasitas homogen basal dengan meniskus','Mendukung efusi pleura.'],['USG toraks','Koleksi cairan anekoik di rongga pleura','Mengonfirmasi cairan dan memandu torakosentesis.'],['Cairan pleura','Protein/LDH dibandingkan serum','Gunakan kriteria Light untuk membedakan transudat dan eksudat.']]);
-  if(/pneumotoraks/.test(t))return panel([['Foto toraks','Garis pleura viseral; corakan paru tidak tampak di perifer garis','Mendukung pneumotoraks.'],['USG paru','Lung sliding tidak tampak; lung point dapat terlihat','Mendukung pneumotoraks pada konteks tepat.'],['AGD','Dapat ditemukan hipoksemia','Menilai gangguan gas darah, bukan syarat diagnosis.']]);
-  if(/asma|ppok|emfisema|bronkitis|fibrosis paru/.test(t))return panel([['Spirometri','FEV₁, FVC, rasio FEV₁/FVC dan kurva flow-volume','Rasio di bawah LLN menunjukkan obstruksi; FVC rendah dengan rasio normal/tinggi mengarah dugaan restriksi, perlu TLC untuk konfirmasi.'],['PEF serial','Dibandingkan nilai terbaik/prediksi','Variabilitas mendukung asma; nilai tunggal tidak cukup.'],['SpO₂','Ukur saat istirahat/aktivitas sesuai indikasi','Menilai oksigenasi, bukan ventilasi/CO₂.']],'Spirometri diagnostik dilakukan saat kondisi stabil dan manuver memenuhi standar kualitas.',{src:'https://apps.uworld.com/media/L7317.png',alt:'Perbandingan kurva flow-volume normal, obstruktif, stenosis trakea, dan restriktif.',url:'https://medical.uworld.com/library/pulmonary-critical-care/439/pulmonary-function-testing/'});
- }
- if(system==='Kardiovaskular'){
-  if(/infark miokard|angina/.test(t))return panel([['EKG 12 sadapan','Contoh STEMI inferior: elevasi ST pada II, III, aVF','Pola iskemia akut; gunakan sadapan kontigu dan ambang sesuai sadapan.'],['Troponin hs','Di atas persentil ke-99 dengan pola naik/turun serial','Mendukung cedera miokard akut; infark memerlukan konteks iskemia.'],['Ekokardiografi','Gangguan gerak dinding regional','Mendukung iskemia/infark dan menilai fungsi ventrikel.']]);
-  if(/hipertensi/.test(t))return panel([['Tekanan darah berulang','Contoh rerata 152/96 mmHg','Konfirmasi dengan pengukuran terstandar dan/atau HBPM/ABPM sesuai pedoman.'],['Urinalisis/ACR','Albuminuria; ACR 45 mg/g','Menilai keterlibatan ginjal/organ target.'],['Kreatinin/eGFR','1,0 mg/dL; eGFR 88 mL/menit/1,73 m²','Baseline fungsi ginjal dan stratifikasi risiko.'],['EKG','Dapat tampak kriteria hipertrofi ventrikel kiri','Mendukung kerusakan organ target; EKG normal tidak menyingkirkan hipertensi.']]);
-  if(/gagal jantung/.test(t))return panel([['NT-proBNP','1.850 pg/mL (contoh)','Peningkatan mendukung gagal jantung; dipengaruhi usia, fungsi ginjal, obesitas dan kondisi lain.'],['Ekokardiografi','LVEF 30% (contoh HFrEF), dilatasi ventrikel kiri','Menilai fraksi ejeksi, struktur dan fungsi jantung.'],['Foto toraks','Kardiomegali, kongesti vaskular, edema interstisial/garis Kerley B','Mendukung kongesti; foto normal tidak sepenuhnya menyingkirkan gagal jantung.']]);
-  if(/fibrilasi atrium|atrial flutter|takikardia|ekstrasistol|fibrilasi ventrikel/.test(t))return panel([['EKG 12 sadapan','AF: RR irregularly irregular tanpa gelombang P konsisten; flutter: gelombang F saw-tooth','Mengenali jenis aritmia; nilai QRS, frekuensi dan stabilitas.'],['Elektrolit','K 3,1 mmol/L; Mg 1,5 mg/dL (contoh)','Kelainan elektrolit dapat memicu/memperberat aritmia.'],['TSH','Abnormal atau normal sesuai kasus','Evaluasi penyebab terpilih seperti hipertiroid pada AF.']]);
- }
- if(system==='Gastrointestinal'){
-  if(/penyakit cacing tambang/.test(t))return panel([['Mikroskopis tinja','Telur oval, bening, dinding tipis, 4–8 blastomer; sekitar 60–75 × 35–40 µm','Menunjukkan telur hookworm; Ancylostoma dan Necator tidak dapat dibedakan dari telur saja.'],['Darah lengkap','Hb 9,8 g/dL; MCV 70 fL','Anemia mikrositik dapat terjadi akibat kehilangan darah kronik.'],['Ferritin','Rendah','Mendukung defisiensi besi.']],'Telur hookworm tidak dapat dibedakan sampai tingkat spesies hanya berdasarkan morfologi telur.',{src:'https://www.cdc.gov/dpdx/hookworm/images/1/Hookworm_egg_wtmt.jpg',alt:'Telur cacing tambang pada sediaan tinja basah 400×, oval dan berdinding tipis.',url:'https://www.cdc.gov/dpdx/hookworm/index.html'});
-  if(/strongiloidiasis/.test(t))return panel([['Mikroskopis tinja segar','Larva rhabditiform dengan rongga mulut pendek dan genital primordium menonjol','Mendukung Strongyloides stercoralis; pemeriksaan tinja tunggal kurang sensitif.'],['Pemeriksaan serial/konsentrasi','Larva ditemukan pada sampel berulang','Meningkatkan sensitivitas deteksi.'],['Serologi Strongyloides IgG','Positif (contoh)','Mendukung infeksi; dapat bereaksi silang dan tidak selalu membedakan infeksi lampau.']],'Penting skrining pada pasien yang akan mendapat imunosupresi karena risiko hiperinfeksi.',{src:'https://www.cdc.gov/dpdx/strongyloidiasis/images/1/S_stercoralis_rhabditoid_BAM8.jpg',alt:'Larva rhabditiform Strongyloides pada pemeriksaan mikroskopis.',url:'https://www.cdc.gov/dpdx/strongyloidiasis/index.html'});
-  if(/askariasis/.test(t))return panel([['Mikroskopis tinja','Telur fertil oval, dinding tebal dengan lapisan albumin bermamila; sekitar 45–75 µm','Mendukung Ascaris lumbricoides.'],['Darah lengkap','Eosinofilia dapat ditemukan pada fase migrasi larva','Temuan pendukung, tidak spesifik.'],['USG/foto abdomen bila komplikasi','Tanda obstruksi atau struktur tubular/cacing pada lumen/biliaris','Dipertimbangkan bila kolik, muntah, distensi atau dugaan migrasi.']],'',{src:'https://www.cdc.gov/dpdx/ascariasis/images/2/Ascaris_fertile_BAM1.jpg',alt:'Telur fertil Ascaris lumbricoides dengan dinding tebal dan lapisan bermamila.',url:'https://www.cdc.gov/dpdx/ascariasis/index.html'});
-  if(/taeniasis/.test(t))return panel([['Mikroskopis tinja','Telur bulat, dinding tebal berstri radial dan onkosfer berkait','Mendukung Taenia spp.; telur tidak membedakan T. solium dan T. saginata.'],['Proglotid gravid/scolex','Cabang uterus lateral atau morfologi scolex membantu identifikasi spesies','Penting membedakan T. solium karena risiko sistiserkosis.'],['CT/MRI otak bila gejala neurologis','Lesi kista/kalsifikasi sesuai stadium','Bukan pemeriksaan rutin taeniasis intestinal; dipertimbangkan bila curiga neurocysticercosis.']],'Jangan menentukan spesies Taenia hanya dari telur.',{src:'https://www.cdc.gov/dpdx/taeniasis/images/1/Taenia_eggs_wtmt_400x.jpg',alt:'Telur Taenia spp. dengan striasi radial pada mikroskopis tinja.',url:'https://www.cdc.gov/dpdx/taeniasis/index.html'});
-  if(/giardia|gastroenteritis/.test(t))return panel([['Mikroskopis tinja','Kista oval dengan 4 inti atau trofozoit berbentuk buah pir dengan 2 inti','Mendukung Giardia duodenalis; sampel serial dapat diperlukan.'],['Antigen/PCR tinja','Antigen Giardia atau DNA terdeteksi','Membantu konfirmasi dengan sensitivitas lebih baik.'],['Elektrolit/ureum/kreatinin','Dapat berubah akibat dehidrasi','Menilai komplikasi cairan, bukan identifikasi patogen.']],'',{src:'https://www.cdc.gov/dpdx/giardiasis/images/1/Giardia_cyst_wtmt.jpg',alt:'Kista Giardia duodenalis pada mikroskopis tinja.',url:'https://www.cdc.gov/dpdx/giardiasis/index.html'});
-  if(/apendisitis/.test(t))return panel([['USG abdomen','Apendiks nonkompresibel, diameter luar >6 mm, dinding menebal, hiperemia ± appendicolith','Mendukung apendisitis akut.'],['Darah lengkap/CRP','Leukosit 14.500/µL; neutrofil 85%; CRP meningkat','Mendukung inflamasi tetapi tidak menegakkan sendiri.'],['CT abdomen bila perlu','Apendiks membesar, dinding menebal/enhancement, fat stranding','Membantu pada diagnosis meragukan/komplikasi.']]);
-  if(/kolesistitis/.test(t))return panel([['USG kuadran kanan atas','Batu, dinding kandung empedu >3 mm, cairan perikolesistik, sonographic Murphy sign','Kombinasi temuan mendukung kolesistitis akut.'],['Darah lengkap/CRP','Leukosit 13.000/µL; CRP meningkat','Mendukung inflamasi.'],['Fungsi hati','Bilirubin/ALP dapat meningkat bila obstruksi duktus','Evaluasi koledokolitiasis/kolangitis bila abnormal.']]);
-  if(/hepatitis a|hepatitis b/.test(t))return panel([['AST/ALT','ALT 1.250 U/L; AST 980 U/L','Pola hepatoseluler; tidak menentukan virus penyebab.'],['Serologi HAV','Anti-HAV IgM positif','Mendukung hepatitis A akut.'],['Serologi HBV','HBsAg dan anti-HBc IgM positif','Mendukung hepatitis B akut; interpretasikan panel lengkap.'],['Bilirubin/INR','Bilirubin 5 mg/dL; INR 1,4','Menilai ikterus dan fungsi sintesis; INR naik perlu perhatian.']]);
-  if(/tifoid/.test(t))return panel([['Kultur darah','Salmonella enterica serovar Typhi tumbuh','Pemeriksaan konfirmasi utama; sensitivitas dipengaruhi antibiotik dan waktu pengambilan.'],['Darah lengkap','Leukosit 3.800/µL (contoh)','Leukopenia dapat ditemukan tetapi tidak spesifik.'],['Widal','Titer tunggal meningkat','Spesifisitas terbatas; bukan penentu tunggal diagnosis.']]);
- }
- if(system==='Neurologi'){
-  if(/stroke|perdarahan intraserebral|perdarahan subaraknoid/.test(t))return panel([['CT kepala nonkontras','Perdarahan tampak hiperdens; iskemik dini dapat belum tampak','Membedakan perdarahan dari iskemik sebelum keputusan reperfusi.'],['CTA kepala/leher bila indikasi','Oklusi pembuluh besar/stenosis','Membantu seleksi tindakan endovaskular dan etiologi.'],['Glukosa bedside','58 mg/dL (contoh)','Hipoglikemia dapat menyerupai stroke; periksa segera.']]);
-  if(/meningitis|ensefalitis/.test(t))return panel([['CSF—sel dan diferensial','Bakterial: neutrofil dominan; viral: limfosit dominan','Pola membantu etiologi, dapat tumpang tindih.'],['CSF kimia','Bakterial: protein naik, glukosa rendah; viral: glukosa umumnya normal','Mendukung diferensiasi.'],['Gram/kultur/PCR CSF','Dapat positif sesuai patogen','Membantu konfirmasi; terapi empiris meningitis bakterial tidak boleh tertunda.']]);
-  if(/epilepsi|kejang/.test(t))return panel([['Glukosa bedside','92 mg/dL (contoh)','Menyingkirkan hipoglikemia sebagai pencetus akut.'],['Elektrolit','Na 138 mmol/L; Ca/Mg sesuai rujukan','Gangguan elektrolit dapat memicu kejang.'],['EEG','Spike/sharp waves bila tertangkap','Mendukung epilepsi; EEG normal tidak menyingkirkan.'],['MRI/CT otak bila indikasi','Lesi struktural atau dapat normal','Mencari penyebab struktural.']]);
- }
- if(system==='Psikiatri')return panel([['Status mental','Penampilan, perilaku, bicara, mood/afek, proses dan isi pikir, persepsi, kognitif, tilikan dan penilaian','Pemeriksaan inti; dokumentasikan temuan objektif.'],['Fisik/neurologis terarah','Tanda vital, kesadaran, tanda intoksikasi/putus zat, defisit neurologis','Mencari penyebab organik/medis yang menyerupai gangguan psikiatri.'],['Laboratorium sesuai indikasi','Glukosa, darah lengkap, elektrolit, fungsi tiroid/ginjal/hati, toksikologi atau tes kehamilan','Tidak ada panel wajib untuk semua gangguan psikiatri; pilih berdasarkan dugaan klinis.']],'Diagnosis psikiatri terutama berdasarkan anamnesis dan status mental; penunjang dipilih untuk menyingkirkan penyebab medis/neurologis atau menilai keamanan terapi.');
- return '';
+ const sets={
+ 'Respirasi':[
+ ['SpO₂ udara ruangan','<94% (perlu konteks)','95–100%','—','%'],
+ ['Frekuensi napas dewasa','<12/menit','12–20/menit','>20/menit','x/menit'],
+ ['pH darah arteri','<7,35','7,35–7,45','>7,45','—'],
+ ['PaO₂','<80','80–100','>100 (interpretasi sesuai FiO₂)','mmHg'],
+ ['PaCO₂','<35','35–45','>45','mmHg'],
+ ['HCO₃⁻','<22','22–26','>26','mmol/L'],
+ ['FEV₁/FVC','Di bawah LLN = obstruksi','≥LLN sesuai usia/jenis kelamin/tinggi badan','—','rasio'],
+ ['Respons bronkodilator','—','Perubahan FEV₁ atau FVC >10% nilai prediksi (standar ERS/ATS)','—','% nilai prediksi'],
+ ['Peak expiratory flow','Di bawah 80% nilai terbaik/prediksi dapat menunjukkan penurunan','Variasi harian dewasa umumnya ≤10%','Variabilitas >10% dapat mendukung asma','L/menit']
+ ],
+ 'Kardiovaskular':[
+ ['Tekanan darah dewasa','<90/60 mmHg (hipotensi)','Klasifikasi optimal/normal bergantung pedoman; umumnya <120/80','≥140/90 mmHg: hipertensi bila terkonfirmasi pengukuran berulang','mmHg'],
+ ['Frekuensi nadi dewasa','<60/menit','60–100/menit','>100/menit','x/menit'],
+ ['Hemoglobin pria','<13,0','13,0–17,0','>17,0','g/dL'],
+ ['Hemoglobin wanita tidak hamil','<12,0','12,0–15,0','>15,0','g/dL'],
+ ['Natrium','<135','135–145','>145','mmol/L'],
+ ['Kalium','<3,5','3,5–5,0','>5,0','mmol/L'],
+ ['Kreatinin serum','Di bawah rentang lab','Pria ±0,7–1,3; wanita ±0,6–1,1','Di atas rentang lab; nilai harus dinilai bersama eGFR','mg/dL'],
+ ['Troponin I/T','Tidak ada batas universal; gunakan assay setempat','Di bawah persentil ke-99 assay','Di atas persentil ke-99; nilai serial/delta dan konteks iskemia diperlukan','ng/L atau ng/mL'],
+ ['BNP / NT-proBNP','Tidak digunakan untuk menyatakan rendah secara mandiri','BNP <100 atau NT-proBNP <300 membantu menyingkirkan gagal jantung akut','BNP ≥100 atau NT-proBNP ≥300 dapat mendukung gagal jantung akut; interpretasi dipengaruhi usia/ginjal','pg/mL']
+ ],
+ 'Gastrointestinal':[
+ ['Hemoglobin pria','<13,0','13,0–17,0','>17,0','g/dL'],
+ ['Hemoglobin wanita tidak hamil','<12,0','12,0–15,0','>15,0','g/dL'],
+ ['Leukosit','<4.000','4.000–10.000','>10.000','/µL'],
+ ['Trombosit','<150.000','150.000–450.000','>450.000','/µL'],
+ ['AST (SGOT)','Di bawah rentang lab','±10–40','Di atas batas atas lab','U/L'],
+ ['ALT (SGPT)','Di bawah rentang lab','±7–56','Di atas batas atas lab','U/L'],
+ ['Bilirubin total','Di bawah rentang lab','±0,2–1,2','>1,2','mg/dL'],
+ ['Albumin','<3,5','3,5–5,0','>5,0','g/dL'],
+ ['CRP','—','Umumnya <5 (tergantung lab)','Di atas batas lab; tidak spesifik','mg/L'],
+ ['Lipase','Di bawah rentang lab','Umumnya 13–60 (tergantung metode)','>3 kali batas atas normal mendukung pankreatitis bila sesuai klinis','U/L'],
+ ['Natrium','<135','135–145','>145','mmol/L'],
+ ['Kalium','<3,5','3,5–5,0','>5,0','mmol/L']
+ ],
+ 'Neurologi':[
+ ['Glukosa darah sewaktu','<70: hipoglikemia','Tidak ada satu rentang normal untuk GDS; interpretasi sesuai waktu makan','≥200 disertai gejala klasik dapat memenuhi kriteria diabetes','mg/dL'],
+ ['Natrium','<135','135–145','>145','mmol/L'],
+ ['Kalium','<3,5','3,5–5,0','>5,0','mmol/L'],
+ ['Kalsium total','<8,5','8,5–10,5','>10,5','mg/dL'],
+ ['Leukosit darah','<4.000','4.000–10.000','>10.000','/µL'],
+ ['CSF: leukosit','—','0–5 sel/µL (dewasa)','>5 sel/µL: pleositosis; lihat diferensial','sel/µL'],
+ ['CSF: protein','—','15–45 mg/dL (bergantung lab)','>45 mg/dL','mg/dL'],
+ ['CSF: glukosa','<40 atau rasio CSF:serum <0,4 mencurigakan','Umumnya sekitar ⅔ glukosa serum','—','mg/dL'],
+ ['INR','<0,8','±0,8–1,2 tanpa antikoagulan','>1,2; target terapi warfarin berbeda sesuai indikasi','—']
+ ],
+ 'Psikiatri':[
+ ['TSH (bila ada indikasi klinis)','<0,4','±0,4–4,0','>4,0','mIU/L'],
+ ['Glukosa puasa (bila ada indikasi)','<70','70–99','100–125: prediabetes; ≥126: diabetes bila terkonfirmasi','mg/dL'],
+ ['Natrium (bila ada indikasi)','<135','135–145','>145','mmol/L'],
+ ['Vitamin B₁₂ (bila ada indikasi)','<200','±200–900','—','pg/mL'],
+ ['Hemoglobin (pria)','<13,0','13,0–17,0','>17,0','g/dL'],
+ ['Hemoglobin (wanita tidak hamil)','<12,0','12,0–15,0','>15,0','g/dL']
+ ]
+ };
+ const rows=sets[system]||sets['Neurologi'];
+ const htmlRows=rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('');
+ return '<section class="study-points"><h3>📏 Nilai rujukan pemeriksaan penunjang</h3><p class="muted">Ini adalah nilai rujukan umum dewasa, bukan hasil pasien simulasi. Rentang dapat berbeda antar laboratorium, metode, usia, jenis kelamin, kehamilan, dan kondisi klinis.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi</th><th>Satuan</th></tr></thead><tbody>'+htmlRows+'</tbody></table></div><p class="muted">Catatan untuk '+system+': '+(system==='Respirasi'?'Nilai spirometri harus dibandingkan dengan LLN atau nilai prediksi individual; tidak memakai satu angka FEV₁/FVC normal untuk semua usia.':'Gunakan rentang rujukan yang tercantum pada hasil laboratorium setempat. Penanda tinggi/rendah tidak otomatis menetapkan diagnosis.')+'</p></section>';
 }
-
 function clinicalSignature(title,system){
  const t=String(title||'').toLowerCase();
  const rules={
@@ -1856,23 +1880,29 @@ const endocrineLessons=endocrineRows.map(r=>({title:r[0]+' · '+r[1],sub:'Materi
 ['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],...highYieldDiagnosisSections(r[3],r[4],r[5]),['Pemeriksaan fisik dan temuan khas',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana awal dan rujukan',r[7]],['Edukasi, komplikasi, dan tindak lanjut',r[8]],['Kompetensi SKDI',r[0]+' — klasifikasi kompetensi mengikuti daftar penyakit SKDI 2012; kegawatdaruratan harus distabilisasi dan dirujuk.']
 ]}));
 function endocrineResultPanel(l){
- const t=l.title.toLowerCase();
- let rows=[];
- if(t.includes('diabetes melitus tipe 1')||t.includes('diabetes melitus tipe 2')||t.includes('tipe lain')) rows=[['GDP','138 mg/dL','Normal <100; diabetes ≥126'],['HbA1c','7,8%','Normal <5,7%; diabetes ≥6,5%'],['Glukosa 2 jam TTGO','224 mg/dL','Diabetes ≥200'],['Kreatinin','0,9 mg/dL','Contoh rentang dewasa 0,6–1,2']];
- else if(t.includes('ketoasidosis')) rows=[['Glukosa','286 mg/dL','KAD dapat ≥200 atau riwayat DM'],['β-hidroksibutirat','5,2 mmol/L','Ketonemia signifikan ≥3'],['pH vena','7,18','Asidosis <7,3'],['HCO3−','10 mmol/L','Asidosis <18'],['Kalium','5,1 mmol/L','Serum awal dapat normal/tinggi meski defisit total tubuh']];
- else if(t.includes('hiperglikemia hiperosmolar')) rows=[['Glukosa','720 mg/dL','HHS ≥600'],['Na+','148 mmol/L','Gunakan untuk hitung osmolalitas'],['Osmolalitas efektif','336 mOsm/kg','HHS >300'],['β-hidroksibutirat','1,0 mmol/L','HHS <3'],['pH / HCO3−','7,36 / 20 mmol/L','pH ≥7,3 dan HCO3 ≥15']];
- else if(t.includes('hipoglikemia')) rows=[['Glukosa kapiler','48 mg/dL','Level 1 <70; level 2 <54'],['Kesadaran','Sadar penuh / atau menurun sesuai skenario','Berat ditentukan perlu bantuan orang lain']];
- else if(t.includes('hipoparatiroid')) rows=[['Kalsium terkoreksi','7,1 mg/dL','Rendah; kisaran umum 8,5–10,5'],['Fosfat','5,8 mg/dL','Dapat meningkat'],['PTH','8 pg/mL','Rendah/tidak sesuai rendah'],['QTc EKG','510 ms','Dapat memanjang']];
- else if(t.includes('hipertiroid')||t.includes('tirotoksikosis')) rows=[['TSH','<0,01 mIU/L','Sering rendah'],['FT4','3,2 ng/dL','Meningkat'],['T3 total','280 ng/dL','Dapat meningkat']];
- else if(t.includes('goiter')) rows=[['TSH','1,8 mIU/L','Contoh dalam rentang rujukan 0,4–4,0'],['USG tiroid','Pembesaran difus, tanpa nodul mencurigakan','Nilai pola dan nodul; sesuaikan dengan laporan radiologi']];
- else if(t.includes('cushing')) rows=[['Kortisol setelah deksametason 1 mg','6,2 µg/dL','Tidak tersupresi; skrining positif perlu konfirmasi'],['ACTH','Interpretasi setelah hiperkortisolisme terkonfirmasi','Membantu klasifikasi etiologi']];
- else if(t.includes('krisis adrenal')) rows=[['Natrium','126 mmol/L','Hiponatremia'],['Kalium','5,8 mmol/L','Hiperkalemia terutama primer'],['Glukosa','58 mg/dL','Hipoglikemia dapat terjadi'],['Kortisol pagi','2 µg/dL','Rendah; jangan tunda steroid pada pasien tidak stabil']];
- else if(t.includes('dislipidemia')) rows=[['LDL-C','190 mg/dL','Interpretasi bersama risiko ASCVD'],['HDL-C','34 mg/dL','Rendah: pria <40, wanita <50'],['Trigliserida','260 mg/dL','Tinggi ≥150'],['Kolesterol total','270 mg/dL','Interpretasi profil lengkap']];
- else if(t.includes('hiperurisemia')) rows=[['Asam urat serum','8,7 mg/dL','Meningkat pada banyak lab; bukan bukti tunggal gout'],['Cairan sendi','Kristal jarum, birefringence negatif','Temuan diagnostik gout; kultur tetap bila curiga infeksi']];
- else if(t.includes('obesitas')||t.includes('sindrom metabolik')) rows=[['IMT','29,4 kg/m²','Obesitas menurut cut-off Asia ≥25'],['Lingkar perut','96 cm pria / 86 cm wanita','Cut-off Asia 90/80 cm'],['GDP','112 mg/dL','Impaired fasting glucose 100–125'],['Trigliserida / HDL','180 / 36 mg/dL','TG ≥150; HDL rendah pria <40/wanita <50']];
- else if(t.includes('malnutrisi')) rows=[['WHZ anak','−3,4 SD','Wasting berat <−3 SD'],['MUAC usia 6–59 bln','112 mm','Wasting berat <115 mm'],['Edema bilateral','Ada','Tanda gizi buruk akut berat']];
- else rows=[['Pemeriksaan terarah','Dipilih sesuai dugaan klinis','Tidak ada satu panel laboratorium universal untuk semua defisiensi']];
- return '<section class="study-points"><h3>🧪 CONTOH HASIL PEMERIKSAAN & NILAI RUJUKAN</h3><p class="muted">Data berikut adalah simulasi OSCE, bukan hasil pasien nyata. Rentang rujukan dapat berbeda antar laboratorium.</p><table><thead><tr><th>Pemeriksaan</th><th>Hasil simulasi</th><th>Interpretasi / nilai rujukan</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td><b>'+r[1]+'</b></td><td>'+r[2]+'</td></tr>').join('')+'</tbody></table></section>';
+ const rows=[
+ ['Glukosa darah puasa','<70','70–99','100–125: prediabetes; ≥126: diabetes bila terkonfirmasi','mg/dL'],
+ ['Glukosa 2 jam TTGO','<70 dapat hipoglikemia','<140','140–199: prediabetes; ≥200: diabetes','mg/dL'],
+ ['Glukosa darah sewaktu','<70: hipoglikemia','Tidak ada rentang puasa/nonpuasa tunggal','≥200 + gejala klasik dapat memenuhi kriteria diabetes','mg/dL'],
+ ['HbA1c','—','<5,7%','5,7–6,4%: prediabetes; ≥6,5%: diabetes bila metode terstandar/terkonfirmasi','%'],
+ ['β-hidroksibutirat darah','—','<0,6','≥3,0 mmol/L: ketonemia bermakna pada evaluasi KAD','mmol/L'],
+ ['pH darah vena','<7,35','7,31–7,41 (kisaran dapat bervariasi)','>7,41','—'],
+ ['Bikarbonat (HCO₃⁻)','<22','22–29','>29','mmol/L'],
+ ['Osmolalitas efektif','—','275–295','>300 mOsm/kg dapat mendukung HHS bila kriteria lain terpenuhi','mOsm/kg'],
+ ['Natrium','<135','135–145','>145','mmol/L'],
+ ['Kalium','<3,5','3,5–5,0','>5,0','mmol/L'],
+ ['Kalsium total','<8,5','8,5–10,5','>10,5','mg/dL'],
+ ['Fosfat','<2,5','2,5–4,5','>4,5','mg/dL'],
+ ['PTH utuh','Di bawah rentang lab','±10–65 (bergantung assay)','Di atas rentang lab','pg/mL'],
+ ['TSH','<0,4','±0,4–4,0','>4,0','mIU/L'],
+ ['FT4','<0,8','±0,8–1,8','>1,8','ng/dL'],
+ ['Kortisol pagi','<3 µg/dL dapat mendukung insufisiensi adrenal','±5–25 (bergantung jam dan assay)','>25; interpretasi kontekstual','µg/dL'],
+ ['LDL-C','—','Optimal <100 (target bergantung risiko)','≥130 meningkat; ≥190 sangat tinggi','mg/dL'],
+ ['HDL-C','Pria <40; wanita <50 merupakan faktor risiko','Pria ≥40; wanita ≥50','—','mg/dL'],
+ ['Trigliserida','—','<150','150–499 tinggi; ≥500 sangat tinggi','mg/dL'],
+ ['Asam urat','Pria <3,5; wanita <2,5 (kisaran lab bervariasi)','Pria ±3,5–7,2; wanita ±2,5–6,0','Di atas batas atas lab','mg/dL']
+ ];
+ return '<section class="study-points"><h3>📏 Nilai rujukan pemeriksaan penunjang endokrin & metabolik</h3><p class="muted">Nilai rujukan umum dewasa; bukan hasil pasien simulasi. Batas diagnosis diabetes, KAD, HHS, dan gangguan endokrin mengikuti kriteria klinis, bukan sekadar penanda tinggi/rendah. Rentang laboratorium dapat berbeda menurut metode.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi / batas penting</th><th>Satuan</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="muted">Untuk interpretasi khusus diagnosis '+l.title+', cocokkan dengan gejala, pemeriksaan fisik, kriteria diagnostik, dan rentang rujukan laboratorium setempat.</p></section>';
 }
 function openEndocrineLesson(i){
  const l=endocrineLessons[i];if(!l)return;
