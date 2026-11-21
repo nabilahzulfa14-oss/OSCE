@@ -841,9 +841,59 @@ function openGastroLesson(i){
  const v=gastroVisuals.find(x=>l.title.includes(x.keys[0]));
  const visual=v?'<section class="study-ecg"><h3>Gambaran klinis / penunjang</h3><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(v.file)+'" alt="'+v.title+'"><p class="muted">'+v.title+'. Gunakan untuk mengenali morfologi, bukan sebagai pengganti penilaian klinis.</p><a href="'+v.url+'" target="_blank" rel="noopener">Sumber gambar</a></section>':'<section class="study-points"><h3>Catatan visual</h3><ul><li>Gambar spesifik tidak ditampilkan bila belum tersedia sumber visual yang terverifikasi; gunakan hasil pemeriksaan yang dijelaskan pada materi.</li></ul></section>';
  const key='<section class="study-key"><h3>🔑 KUNCI DIAGNOSIS</h3><ul><li>'+l.sections[1][1]+'</li><li>'+l.sections[2][1]+'</li></ul></section>';
- $('studyDetail').innerHTML='<div class="tag">STASE GASTROINTESTINAL · SKDI 2012</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+key+visual+l.sections.map(p=>'<section class="study-points"><h3>'+p[0]+'</h3><ul>'+p[1].split(/(?<=[.!?])\\s+/).map(x=>'<li>'+x.trim()+'</li>').join('')+'</ul></section>').join('')+differentialHtml(l.title,'Gastrointestinal')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="secondary" '+(i===0?'disabled':'')+' onclick="openGastroLesson('+(i-1)+')">← Diagnosis sebelumnya</button><button class="teal" '+(i===gastroLessons.length-1?'disabled':'')+' onclick="openGastroLesson('+(i+1)+')">Diagnosis berikutnya →</button></div>';
+ $('studyDetail').innerHTML='<div class="tag">STASE GASTROINTESTINAL · SKDI 2012</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+key+visual+l.sections.map(p=>'<section class="study-points"><h3>'+p[0]+'</h3><ul>'+((p[0]==='Definisi')?gastroDefinition(l.title):p[1]).split(/(?<=[.!?])\\s+/).map(x=>'<li>'+x.trim()+'</li>').join('')+'</ul></section>').join('')+differentialHtml(l.title,'Gastrointestinal')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="secondary" '+(i===0?'disabled':'')+' onclick="openGastroLesson('+(i-1)+')">← Diagnosis sebelumnya</button><button class="teal" '+(i===gastroLessons.length-1?'disabled':'')+' onclick="openGastroLesson('+(i+1)+')">Diagnosis berikutnya →</button></div>';
 }
 
+
+
+function gastroDefinition(title){
+ const t=title.toLowerCase();
+ const rules=[
+ ['kandidiasis','Infeksi pada mukosa mulut oleh jamur Candida, paling sering C. albicans.'],
+ ['ulkus mulut','Luka terbuka pada mukosa mulut; penyebabnya dapat berupa aftosa yang tidak menular atau infeksi herpes simpleks.'],
+ ['glositis','Peradangan lidah yang dapat menyebabkan lidah merah, licin, nyeri, atau mengalami perubahan permukaan.'],
+ ['ludwig','Infeksi selulitis yang menyebar pada ruang submandibula dan dasar mulut, umumnya berasal dari infeksi gigi bawah.'],
+ ['parotitis','Peradangan kelenjar parotis, yaitu kelenjar ludah besar yang terletak di depan dan bawah telinga.'],
+ ['karies','Kerusakan jaringan keras gigi akibat proses demineralisasi oleh asam yang dihasilkan bakteri plak.'],
+ ['esofagitis refluks','Peradangan mukosa esofagus akibat paparan berulang isi lambung yang naik ke esofagus.'],
+ ['korosif','Cedera kimia pada esofagus setelah tertelan zat asam atau basa yang bersifat korosif.'],
+ ['hernia umbilikalis','Penonjolan isi rongga perut melalui kelemahan atau cincin umbilikus.'],
+ ['peritonitis','Peradangan peritoneum, yaitu selaput yang melapisi rongga abdomen dan organ di dalamnya.'],
+ ['gastritis','Peradangan mukosa lambung yang dapat berhubungan dengan H. pylori, obat antiinflamasi nonsteroid, atau iritan lain.'],
+ ['gastroenteritis','Peradangan lambung dan usus yang umumnya menimbulkan diare, muntah, dan nyeri perut akut.'],
+ ['refluks gastroesofagus','Kondisi ketika isi lambung berulang kali naik ke esofagus dan menimbulkan gejala atau komplikasi.'],
+ ['ulkus gaster','Defek/luka pada lapisan mukosa lambung atau duodenum yang menembus mukosa muskularis.'],
+ ['apendisitis akut','Peradangan akut pada apendiks vermiformis yang dapat berkembang menjadi nekrosis, perforasi, atau abses.'],
+ ['abses apendiks','Kumpulan pus terlokalisasi di sekitar apendiks akibat komplikasi apendisitis yang mengalami perforasi atau kebocoran.'],
+ ['tifoid','Infeksi sistemik akibat Salmonella enterica serovar Typhi yang biasanya ditularkan melalui makanan atau minuman terkontaminasi.'],
+ ['perdarahan gastrointestinal','Keluarnya darah dari saluran cerna, yang dapat berasal dari saluran cerna atas maupun bawah.'],
+ ['malabsorpsi','Gangguan penyerapan zat gizi di usus sehingga dapat menyebabkan diare kronis, penurunan berat badan, dan defisiensi nutrisi.'],
+ ['intoleransi makanan','Reaksi tidak diinginkan terhadap makanan yang umumnya tidak melibatkan mekanisme alergi/imun.'],
+ ['alergi makanan','Reaksi imun terhadap protein makanan tertentu yang dapat menimbulkan gejala kulit, saluran cerna, pernapasan, hingga anafilaksis.'],
+ ['keracunan makanan','Penyakit akibat konsumsi makanan yang mengandung mikroorganisme patogen atau toksin.'],
+ ['botulisme','Penyakit neuroparalitik akibat toksin botulinum yang menghambat pelepasan asetilkolin pada sambungan neuromuskular.'],
+ ['cacing tambang','Infeksi cacing tambang usus yang dapat menyebabkan kehilangan darah kronis dan anemia defisiensi besi.'],
+ ['strongiloid','Infeksi nematoda Strongyloides stercoralis yang dapat menetap lama dan mengalami hiperinfeksi pada pasien imunosupresi.'],
+ ['askariasis','Infeksi usus oleh cacing gelang Ascaris lumbricoides yang dapat menyebabkan gangguan nutrisi atau obstruksi.'],
+ ['skistosomiasis','Infeksi cacing darah Schistosoma setelah kontak dengan air tawar yang mengandung larva infektif.'],
+ ['taeniasis','Infeksi usus oleh cacing pita Taenia akibat konsumsi daging yang mengandung larva.'],
+ ['hepatitis a','Peradangan hati akibat infeksi virus hepatitis A, umumnya ditularkan melalui jalur fekal-oral.'],
+ ['hepatitis b','Infeksi hati oleh virus hepatitis B yang dapat bersifat akut maupun berkembang menjadi infeksi kronis.'],
+ ['abses hepar','Kumpulan pus di jaringan hati akibat infeksi; penyebabnya dapat berupa Entamoeba histolytica atau bakteri.'],
+ ['perlemakan hati','Penumpukan lemak berlebihan di hepatosit yang sering berkaitan dengan faktor metabolik atau konsumsi alkohol.'],
+ ['kolesistitis','Peradangan kandung empedu, paling sering akibat sumbatan batu pada duktus sistikus.'],
+ ['divertikul','Divertikulosis adalah kantong-kantong kecil pada dinding kolon; divertikulitis terjadi bila divertikulum mengalami peradangan.'],
+ ['kolitis','Peradangan kolon yang dapat disebabkan infeksi, penyakit radang usus, iskemia, atau obat.'],
+ ['disentri','Sindrom diare inflamatorik yang ditandai feses berdarah atau berlendir, sering disertai tenesmus.'],
+ ['irritable bowel','Gangguan interaksi usus-otak yang menyebabkan nyeri perut berulang terkait perubahan pola buang air besar tanpa bukti kelainan struktural yang menjelaskan gejala.'],
+ ['intususepsi','Keadaan ketika satu segmen usus masuk ke segmen usus di sebelahnya sehingga dapat menyebabkan obstruksi dan gangguan aliran darah.'],
+ ['proktitis','Peradangan mukosa rektum yang dapat menyebabkan nyeri, tenesmus, lendir, atau perdarahan.'],
+ ['abses perianal','Kumpulan pus pada jaringan di sekitar anus akibat infeksi kelenjar anal atau jaringan sekitarnya.'],
+ ['hemoroid','Pembesaran dan pergeseran bantalan vaskular normal di kanalis anus yang dapat menimbulkan perdarahan atau prolaps.']
+ ];
+ const hit=rules.find(x=>t.includes(x[0]));
+ return hit?hit[1]:'Kondisi pada saluran cerna atau organ terkait yang menimbulkan keluhan sesuai lokasi dan mekanisme penyakitnya.';
+}
 
 function differentialPairs(title,system){
  const t=title.toLowerCase();
