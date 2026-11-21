@@ -1749,34 +1749,34 @@ function buildReproLessons(){
 const reproLessons=buildReproLessons();
 function reproVisualBlock(l){
  const name=l.title.replace(/^(4A|3A|3B) · /,'');
- const sets=[
-  {test:/Sindrom duh genital|Vulvitis|Vaginitis|Vaginosis bakterialis|Servisitis|Gonore|Sifilis|Kondiloma|duh genital/i,heading:'Foto klinis infeksi genital dan serviks',items:[
-   {url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'Contoh citra USG obstetri (bukan foto infeksi genital).'},
-   {url:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/daee/11654032/fee2d248476d/IANN_A_2442066_F0001_C.jpg',caption:'Foto klinis dermatologi dari publikasi akses terbuka; bukan gambaran spesifik serviks atau vagina.'}
+ const maps=[
+  {test:/Sindrom duh genital/i,heading:'Contoh etiologi gonore pada sindrom duh genital',images:[
+   {url:'https://wwwn.cdc.gov/phil/PHIL_Images/4087/4087_lores.jpg',alt:'Foto kolposkopi serviks pada pasien dengan gonore',caption:'Gambaran kolposkopi serviks pada kasus gonore dengan servisitis dan duh vagina. Ini contoh etiologi gonore, bukan gambaran semua penyebab duh genital.',credit:'CDC Public Health Image Library, PHIL 4087'}
   ]},
-  {test:/Abortus|Kehamilan normal|Janin tumbuh lambat|FGR|Persalinan preterm|Bayi postmatur|Ketuban pecah dini|Hiperemesis gravidarum|Preeklampsia|Eklampsia|Infeksi pada kehamilan|TORCH|Anemia defisiensi besi pada kehamilan/i,heading:'Pencitraan obstetri',items:[
-   {url:'https://epos.myesr.org/posterimage/esr/ecr2019/148561/media/784308',caption:'USG transabdominal: contoh plasenta previa dan tanda abnormalitas implantasi plasenta. Bukan temuan untuk semua kondisi dalam kelompok ini.'},
-   {url:'https://cdn.mommd.gr/img/900/max/90/2016/04/18/1656100039709-993676791-2_3.jpg?t=ZoBSOw1MmVsYL8J5iT6ggg',caption:'Contoh USG transvaginal serviks pendek/funneling; dapat relevan pada penilaian risiko persalinan prematur.'},
-   {url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'Contoh citra USG obstetri pada evaluasi kehamilan awal.'}
+  {test:/Vaginosis bakterialis/i,heading:'Gambaran mikroskopis vaginosis bakterialis',images:[
+   {url:'https://wwwn.cdc.gov/phil/PHIL_Images/3719/3719_lores.jpg',alt:'Clue cells pada apusan vagina',caption:'Clue cells: sel epitel vagina tertutup bakteri sehingga tepinya tampak kabur/bergranula; temuan mikroskopis khas vaginosis bakterialis.',credit:'CDC Public Health Image Library, PHIL 3719'}
   ]},
-  {test:/Salpingitis|Penyakit radang panggul|Abses tubo-ovarium|Torsi dan ruptur kista ovarium/i,heading:'Pencitraan pelvis dan adneksa',items:[
-   {url:'https://media.springernature.com/lw685/springer-static/image/art%3A10.1007%2Fs00117-018-0475-4/MediaObjects/117_2018_475_Fig3_HTML.png',caption:'Contoh pencitraan pelvis untuk kelainan adneksa; interpretasi gambar harus mengikuti panel dan keterangan asli.'}
+  {test:/Sifilis/i,heading:'Gambaran klinis sifilis',images:[
+   {url:'https://wwwn.cdc.gov/phil/PHIL_Images/2358/2358_lores.jpg',alt:'Chancre sifilis primer dan kondiloma akuminata pada genitalia perempuan',caption:'Foto CDC memperlihatkan chancre vulva pada sifilis primer dan lesi genital wart yang juga tampak pada foto. Chancre klasik berupa ulkus tunggal, tegas, dan tidak nyeri.',credit:'CDC Public Health Image Library, PHIL 2358'}
   ]},
-  {test:/Mastitis|Cracked nipple|Inverted nipple/i,heading:'Gambaran payudara dan laktasi',items:[
-   {url:'https://imgbb.ru/frontend/posts/creation/2022-09-16/9shzij75i7ujjr1ido81c46knrz6b35ozmw.jpg',caption:'Contoh fisura puting pada ibu menyusui; bukan gambaran mastitis atau puting terbenam.'}
+  {test:/Kondiloma akuminatum/i,heading:'Gambaran klinis kondiloma akuminatum',images:[
+   {url:'https://wwwn.cdc.gov/phil/PHIL_Images/2358/2358_lores.jpg',alt:'Kondiloma akuminatum atau genital warts pada genitalia perempuan',caption:'Foto CDC mencantumkan kondiloma akuminatum/genital warts pada genitalia perempuan. Pada gambar yang sama juga tampak chancre sifilis; jangan tertukar kedua lesi.',credit:'CDC Public Health Image Library, PHIL 2358'}
   ]},
-  {test:/Prolaps tali pusat/i,heading:'Diagram kegawatdaruratan obstetri',items:[
-   {url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2019/01/m_butler_c41_f09.png?fit=520%2C477&ssl=1',caption:'Diagram prolaps tali pusat dan prinsip penanganan awal.'}
+  {test:/Servisitis/i,heading:'Gambaran klinis servisitis',images:[
+   {url:'https://wwwn.cdc.gov/phil/PHIL_Images/19141/19141_lores.jpg',alt:'Serviks eritematosa dengan eksudat purulen keluar dari ostium',caption:'Tampak mukosa serviks kemerahan, pembuluh darah melebar, dan eksudat purulen dari ostium serviks; sumber tidak menyebut etiologi spesifik.',credit:'CDC Public Health Image Library, PHIL 19141'}
   ]},
-  {test:/Retensi plasenta|Perdarahan postpartum|Inversio uterus|Subinvolusio uterus|Ruptur serviks|Ruptur perineum|Distosia|Partus lama|Hipoksia janin/i,heading:'Gambaran komplikasi persalinan dan postpartum',items:[
-   {url:'https://media.licdn.com/dms/image/v2/D5622AQGy3n-P5AbgCg/feedshare-shrink_800/B56ZtKT.hlJMAg-/0/1766478311859?e=2147483647&t=bzpCXsViS7rRSkf5iZGJLqY-70qUM2R_BARNSJTLMow&v=beta',caption:'Infografik PPH: 4T, tanda klinis, dan prinsip penanganan. Ini infografik, bukan foto pasien.'},
-   {url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2021/03/421078_1_En_37_Figd_HTML.png?fit=1200%2C1013&ssl=1',caption:'Contoh citra USG uterus untuk evaluasi sisa jaringan/retensi produk konsepsi.'}
-  ]}
+  {test:/Kista dan abses kelenjar Bartholin/i,heading:'Gambaran klinis kista Bartholin',images:[
+   {url:'https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/professional/images/b/a/r/bartholins_cyst_high.jpg?mw=2048&sc_lang=en&thn=0',alt:'Kista Bartholin menyebabkan pembesaran unilateral di introitus vagina',caption:'Pembengkakan unilateral pada area posterolateral introitus akibat kista Bartholin; abses biasanya lebih nyeri, merah, hangat, dan nyeri tekan.',credit:'Merck Manual Professional Edition'}
+  ]},
+  {test:/Polip serviks/i,heading:'Gambaran klinis polip serviks',images:[
+   {url:'https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/professional/images/m/8/5/m8500537-cervical-polyp-science-photo-library-high.jpg?mw=2048&sc_lang=en-us',alt:'Polip serviks merah terlihat melalui spekulum',caption:'Polip serviks tampak sebagai jaringan polipoid merah yang menonjol dari ostium serviks saat pemeriksaan spekulum.',credit:'Merck Manual Professional Edition / Science Photo Library'}
+  ]},
+  {test:/Salpingitis|Penyakit radang panggul \(PID\)/i,heading:'Ilustrasi anatomi salpingitis / PID',pdf:'https://www.cdc.gov/sti/media/pdfs/2024/03/Acute-Salpingitis-PID.pdf',caption:'Ilustrasi CDC membandingkan tuba falopi normal dengan tuba yang mengalami infeksi pada salpingitis/PID.'}
  ];
- const group=sets.find(x=>x.test.test(name));
- const items=group?group.items:[];
- const html=items.map(v=>'<figure style="margin:10px 0"><img src="'+v.url+'" alt="'+v.caption+'" loading="lazy" referrerpolicy="no-referrer" style="display:block;width:100%;max-height:360px;object-fit:contain;background:#fff;border:1px solid var(--line,#ddd);border-radius:12px" onerror="this.closest(\'figure\').style.display=\'none\'"><figcaption class="muted" style="font-size:12px;margin-top:6px">'+v.caption+'</figcaption></figure>').join('');
- return '<section class="study-ecg"><h3>🖼️ '+(group?group.heading:'Gambar klinis / pemeriksaan')+' — '+name+'</h3>'+(html||'<p class="muted">Belum ada foto spesifik yang dapat disematkan dengan sumber terverifikasi untuk diagnosis ini. Aku tidak menampilkan gambar penyakit lain sebagai pengganti.</p>')+'</section>';
+ const m=maps.find(x=>x.test.test(name));
+ if(!m)return '<section class="study-ecg"><h3>🖼️ Gambaran penyakit — '+name+'</h3><p class="muted">Tidak ada satu foto klinis yang menjadi gambaran khas/diagnostik tunggal untuk kondisi ini. Diagnosis ditegakkan dari anamnesis, pemeriksaan fisik, dan pemeriksaan penunjang yang dijelaskan pada materi; aku tidak memasang foto penyakit lain sebagai pengganti.</p></section>';
+ if(m.pdf)return '<section class="study-ecg"><h3>🖼️ '+m.heading+'</h3><iframe src="'+m.pdf+'#page=1&view=FitH" title="'+m.heading+'" loading="lazy" style="width:100%;height:420px;border:1px solid var(--line,#ddd);border-radius:12px;background:#fff"></iframe><p class="muted">'+m.caption+' · Sumber: CDC STI Picture Cards.</p></section>';
+ return '<section class="study-ecg"><h3>🖼️ '+m.heading+'</h3>'+m.images.map(x=>'<figure style="margin:10px 0"><img src="'+x.url+'" alt="'+x.alt+'" loading="lazy" referrerpolicy="no-referrer" style="display:block;width:100%;max-height:420px;object-fit:contain;background:#fff;border:1px solid var(--line,#ddd);border-radius:12px" onerror="this.closest(\'figure\').innerHTML=\'<p class=muted>Gambar dari sumber tidak berhasil dimuat.</p>\'"><figcaption class="muted" style="font-size:12px;margin-top:6px">'+x.caption+'<br><b>Sumber:</b> '+x.credit+'</figcaption></figure>').join('')+'</section>';
 }
 function openReproLesson(i){
  const l=reproLessons[i];if(!l)return;
