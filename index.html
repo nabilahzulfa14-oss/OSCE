@@ -113,19 +113,6 @@ const $=id=>document.getElementById(id);
    if(btn.id==='choosePractice'){ev.preventDefault();setMode('practice');return;}
    if(btn.id==='backModes'){ev.preventDefault();$('studyPanel').classList.add('hidden');$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden');return;}
    if(btn.id==='backModesPractice'){ev.preventDefault();$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden');return;}
-   if(btn.classList.contains('study-item') && btn.dataset.lesson!==undefined){
-    ev.preventDefault();ev.stopImmediatePropagation();const i=Number(btn.dataset.lesson),spec=$('studySpec').value;
-    if(spec==='Kardiovaskular')openCardioLesson(i);
-    else if(spec==='Respirasi')openRespiratoryLesson(i);
-    else if(spec==='Gastrointestinal')openGastroLesson(i);
-    else if(spec==='Neurologi')openNeuroLesson(i);
-    else if(spec==='Psikiatri')openPsychiatryLesson(i);
-    else if(spec==='Indra')openIndraLesson(i);
-    else if(spec==='Ginjal & Saluran Kemih')openRenalLesson(i);
- else if(spec==='Reproduksi & Obstetri')openReproLesson(i);
-    else if(spec==='Endokrin & Metabolik')openEndocrineLesson(i);
-    return;
-   }
   }catch(err){console.error('MEDOSCE click error:',err);alert('Tombol terdeteksi, tetapi ada kesalahan saat membuka fitur: '+(err&&err.message?err.message:'silakan muat ulang halaman'));}
  },true);
  window.addEventListener('error',function(ev){console.error('MEDOSCE runtime error:',ev.message,ev.filename,ev.lineno);});
@@ -1073,7 +1060,7 @@ function likelyMeningeal(t){return /meningitis|ensefalitis|perdarahan subaraknoi
 
 function renderStudyItems(arr,fn){
 const levels=['4A','3A','3B'];
-return levels.map(level=>{const items=arr.map((l,i)=>({l,i})).filter(x=>x.l.title.startsWith(level+' · '));if(!items.length)return '';return '<div class="study-level-heading">LEVEL '+level+'</div>'+items.map(x=>'<button type="button" class="study-item" data-lesson="'+x.i+'" data-open="'+fn+'">'+x.l.title+'<br><small>'+x.l.sub+'</small></button>').join('');}).join('');
+return levels.map(level=>{const items=arr.map((l,i)=>({l,i})).filter(x=>x.l.title.startsWith(level+' · '));if(!items.length)return '';return '<div class="study-level-heading">LEVEL '+level+'</div>'+items.map(x=>'<button type="button" class="study-item" data-lesson="'+x.i+'" data-open="'+fn+'" onclick="'+fn+'('+x.i+');">'+x.l.title+'<br><small>'+x.l.sub+'</small></button>').join('');}).join('');
 }
 function respiratoryDeepDive(l){
 const t=l.title.toLowerCase();
