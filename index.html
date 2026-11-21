@@ -2255,7 +2255,11 @@ const integumentMorphology=[
 ['Sekunder','Atrofi','Penipisan kulit; tampak tipis/mengilap, kadang pembuluh darah terlihat.','Steroid topikal lama, striae.','<path d="M10 35 Q60 24 110 35" stroke="#c28d78" stroke-width="3" fill="none"/>'],
 ['Sekunder','Sikatriks','Jaringan fibrosa pengganti kulit setelah kerusakan dermis; dapat atrofi, hipertrofik, atau keloid.','Bekas luka, akne nodulokistik.','<path d="M27 40 Q60 4 93 40 Q60 57 27 40Z" fill="#c17f83" stroke="#9b5b62" stroke-width="3"/>']
 ];
-const integumentRows=diseaseBank.filter(d=>d[0]==='Integumen'&&['4A','3A','3B'].includes(d[2])).map(d=>({level:d[2],name:d[1]}));
+const integumentRows=diseaseBank.filter(d=>{
+ const system=String(Array.isArray(d)?d[0]:(d.spec||d.system||'')).trim().toLowerCase();
+ const level=String(Array.isArray(d)?d[2]:(d.level||'')).trim().toUpperCase();
+ return (system==='integumen'||system==='integument'||system==='kulit')&&['4A','3A','3B'].includes(level);
+}).map(d=>Array.isArray(d)?({level:String(d[2]).trim().toUpperCase(),name:d[1]}):({level:String(d.level).trim().toUpperCase(),name:d.name||d.title}));
 const integumentInfo={
 'Veruka vulgaris':['Papul hiperkeratotik kasar/verukosa seperti kembang kol; garis kulit terputus, dapat tampak titik hitam kapiler trombosis.','Diagnosis klinis; dermoskopi dapat memperlihatkan titik merah-hitam. Biopsi bila atipikal.','Kalus: lokasi tekanan dan garis kulit berlanjut. Moluskum: papul licin dengan umbilikasi.','Asam salisilat topikal atau krioterapi terpilih; jangan mengorek/berbagi alat kuku.'],
 'Kondiloma akuminatum':['Papul/plak eksofitik anogenital, lunak, papiler/verukosa seperti kembang kol.','Diagnosis klinis; biopsi bila pigmentasi, indurasi, ulserasi, perdarahan atau diagnosis meragukan. Skrining IMS sesuai risiko.','Kondiloma lata sifilis: plak lebar lembap, serologi sifilis. Moluskum: papul kubah berumbilikasi.','Krioterapi/TCA/terapi topikal sesuai lokasi, kehamilan dan pedoman; evaluasi IMS dan pasangan.'],
@@ -2414,6 +2418,8 @@ function openIntegumentLesson(i){
 }
 function renderIntegumentList(){
  const c={'4A':integumentRows.filter(x=>x.level==='4A').length,'3A':integumentRows.filter(x=>x.level==='3A').length,'3B':integumentRows.filter(x=>x.level==='3B').length};
+ const heading=document.querySelector('#studyPanel .study-layout .panel b');
+ if(heading) heading.textContent='Daftar diagnosis SKDI Integumen';
  $('studyCount').textContent=integumentRows.length+' diagnosis · SKDI 4A ('+c['4A']+'), 3A ('+c['3A']+'), 3B ('+c['3B']+')';
  $('studyList').innerHTML='<button type="button" class="study-item active" onclick="openIntegumentUKK()" style="text-align:left"><b>01 · MORFOLOGI UKK</b><br><span class="muted">Jenis lesi primer/sekunder, ilustrasi, ciri dan cara mendeskripsikan</span></button>'+integumentRows.map((x,i)=>'<button type="button" class="study-item" data-lesson="'+i+'" onclick="openIntegumentLesson('+i+')" style="text-align:left"><b>'+x.level+' · '+x.name+'</b></button>').join('');
  openIntegumentUKK();
