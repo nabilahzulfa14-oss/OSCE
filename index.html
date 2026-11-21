@@ -177,20 +177,7 @@ $('requestExam').onclick=()=>{
 };
 loadCase(cases[0]);
 
-function updateAvailable(){
- const sp=$('dashSpec').value,lv=$('dashLevel').value;
- const a=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
- $('availableInfo').textContent=a.length+' penyakit tersedia dan dapat dibuka sebagai simulasi latihan. Sebelas stasiun awal memiliki skenario terkurasi; entri lain memakai template kasus latihan yang perlu diperkaya.';
-}
-$('dashSpec').onchange=updateAvailable;$('dashLevel').onchange=updateAvailable;updateAvailable();
-$('backDashboard').onclick=()=>{$('stationArea').classList.remove('active');$('stationArea').classList.remove('blind-mode');$('dashboard').classList.remove('hidden');paused=true;$('pauseTimer').textContent='Lanjutkan';window.scrollTo({top:0,behavior:'smooth'})};
-$('startRandom').onclick=()=>{
- const sp=$('dashSpec').value,lv=$('dashLevel').value;
- const pool=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
- if(!pool.length){alert('Tidak ada penyakit untuk filter ini.');return;}
- const chosen=pool[Math.floor(Math.random()*pool.length)];
- playDisease(diseaseBank.indexOf(chosen));
-};
+
 
 
 const diseaseBank = [
@@ -593,6 +580,22 @@ const diseaseBank = [
 ["Forensik","Kematian mendadak","3B"],
 ["Forensik","Toksikologi forensik","3A"]
 ].map(([spec,name,level])=>({spec,name,level}));
+
+function updateAvailable(){
+ const sp=$('dashSpec').value,lv=$('dashLevel').value;
+ const a=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
+ $('availableInfo').textContent=a.length+' penyakit tersedia dan dapat dibuka sebagai simulasi latihan. Sebelas stasiun awal memiliki skenario terkurasi; entri lain memakai template kasus latihan yang perlu diperkaya.';
+}
+$('dashSpec').onchange=updateAvailable;$('dashLevel').onchange=updateAvailable;updateAvailable();
+$('backDashboard').onclick=()=>{$('stationArea').classList.remove('active');$('stationArea').classList.remove('blind-mode');$('dashboard').classList.remove('hidden');paused=true;$('pauseTimer').textContent='Lanjutkan';window.scrollTo({top:0,behavior:'smooth'})};
+$('startRandom').onclick=()=>{
+ const sp=$('dashSpec').value,lv=$('dashLevel').value;
+ const pool=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
+ if(!pool.length){alert('Tidak ada penyakit untuk filter ini.');return;}
+ const chosen=pool[Math.floor(Math.random()*pool.length)];
+ playDisease(diseaseBank.indexOf(chosen));
+};
+
 
 
 function setMode(m){$('modeChooser').classList.add('hidden');$('studyPanel').classList.toggle('hidden',m!=='study');$('practicePanel').classList.toggle('hidden',m!=='practice')}
