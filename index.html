@@ -782,7 +782,8 @@ function openCardioLesson(i){
   {match:'Infark miokard',title:'Contoh EKG infark miokard dengan elevasi ST',file:'12 Lead EKG ST Elevation tracing only.jpg',source:'https://commons.wikimedia.org/wiki/Category:ECG_of_myocardial_infarction'},
   {match:'Fibrilasi atrium',title:'Contoh EKG fibrilasi atrium',file:'ECG_Atrial_Fibrillation.svg',source:'https://commons.wikimedia.org/wiki/File:ECG_Atrial_Fibrillation.svg'},
   {match:'Flutter atrium',title:'Contoh EKG flutter atrium',file:'ECG-atrial_flutter.jpg',source:'https://commons.wikimedia.org/wiki/Category:ECG'},
-  {match:'Takikardia ventrikel',title:'Contoh EKG takikardia ventrikel',file:'Electrocardiogram_of_Ventricular_Tachycardia.png',source:'https://commons.wikimedia.org/wiki/Category:ECG_of_myocardial_infarction'}
+  {match:'Takikardia supraventrikular dan ventrikular',title:'Contoh EKG takikardia ventrikel',file:'Electrocardiogram_of_Ventricular_Tachycardia.png',source:'https://commons.wikimedia.org/wiki/File:Electrocardiogram_of_Ventricular_Tachycardia.png'},
+  {match:'Fibrilasi ventrikel',title:'Contoh EKG fibrilasi ventrikel',file:'Ventricular_fibrillation_(from_ecg-quiz.com).jpg',source:'https://commons.wikimedia.org/wiki/File:Ventricular_fibrillation_(from_ecg-quiz.com).jpg'}
  ];
  const ecg=ecgImages.find(x=>l.title.toLowerCase().includes(x.match.toLowerCase()));
  const imageBlock=ecg?'<section class="study-ecg"><h3>Gambaran EKG</h3><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(ecg.file)+'" alt="'+ecg.title+'" /><p class="muted">'+ecg.title+'. Gunakan gambar untuk latihan mengenali pola; interpretasi tetap harus dikaitkan dengan kondisi klinis dan EKG 12 sadapan pasien.</p><a href="'+ecg.source+'" target="_blank" rel="noopener">Sumber gambar Wikimedia Commons</a></section>':'';
