@@ -1749,19 +1749,34 @@ function buildReproLessons(){
 const reproLessons=buildReproLessons();
 function reproVisualBlock(l){
  const name=l.title.replace(/^(4A|3A|3B) · /,'');
- const visuals=[
-  {test:/Abortus spontan inkomplit|Abortus spontan komplit|Abortus mengancam/,items:[{url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'Contoh citra USG obstetri untuk evaluasi kehamilan awal dan abortus.',source:'Wikimedia Commons'}]},
-  {test:/Prolaps tali pusat/,items:[{url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2019/01/m_butler_c41_f09.png?fit=520%2C477&ssl=1',caption:'Diagram prolaps tali pusat dan prinsip penanganan awal kegawatdaruratan obstetri.',source:'OBGYN Key'}]},
-  {test:/Kondiloma akuminatum/,items:[{url:'https://www.researchgate.net/publication/367020931/figure/fig1/AS%3A11431281112902463%401673583891058/Gross-image-ultrasound-and-magnetic-resonance-image-MRI-of-the-condyloma-acuminata.jpg',caption:'Gambaran makroskopis kondiloma akuminatum serviks disertai contoh pencitraan pada laporan kasus.',source:'Laporan kasus · ResearchGate'}]},
-  {test:/Korioamnionitis/,items:[{url:'https://epos.myesr.org/posterimage/esr/ecr2019/146792/media/805851',caption:'USG transvaginal: debris ekogenik pada cairan ketuban dan gambaran serviks yang dapat menyertai korioamnionitis.',source:'ESR EPOS'}]},
-  {test:/Abses tubo-ovarium|Salpingitis|Penyakit radang panggul|Torsi dan ruptur kista ovarium/,items:[{url:'https://media.springernature.com/lw685/springer-static/image/art%3A10.1007%2Fs00117-018-0475-4/MediaObjects/117_2018_475_Fig3_HTML.png',caption:'Panel pencitraan penyebab nyeri pelvis: termasuk abses tubo-ovarium dan torsi adneksa. Panel lain menunjukkan diagnosis banding, bukan semuanya PID.',source:'Die Radiologie · Springer Nature'}]},
-  {test:/Retensi plasenta|Perdarahan postpartum|Inversio uterus|Subinvolusio uterus/,items:[{url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2021/03/421078_1_En_37_Figd_HTML.png?fit=1200%2C1013&ssl=1',caption:'Kumpulan citra USG uterus untuk evaluasi sisa jaringan/retensi plasenta; bukan pengganti penilaian klinis perdarahan postpartum.',source:'OBGYN Key'}]},
-  {test:/Mastitis laktasi|Cracked nipple|Inverted nipple/,items:[{url:'https://imgbb.ru/frontend/posts/creation/2022-09-16/9shzij75i7ujjr1ido81c46knrz6b35ozmw.jpg',caption:'Contoh fisura puting pada ibu menyusui. Foto sumber komunitas; gunakan hanya untuk mengenali bentuk fisura, bukan menentukan infeksi.',source:'Foto klinis komunitas'}]},
-  {test:/Persalinan preterm|Ketuban pecah dini|Janin tumbuh lambat|Bayi postmatur|Kehamilan normal/,items:[{url:'https://cdn.mommd.gr/img/900/max/90/2016/04/18/1656100039709-993676791-2_3.jpg?t=ZoBSOw1MmVsYL8J5iT6ggg',caption:'USG transvaginal yang memperlihatkan serviks memendek dan funneling pada kehamilan; contoh temuan yang dapat berkaitan dengan risiko persalinan prematur.',source:'Mothersblog · citra USG'}]}
+ const sets=[
+  {test:/Sindrom duh genital|Vulvitis|Vaginitis|Vaginosis bakterialis|Servisitis|Gonore|Sifilis|Kondiloma|duh genital/i,heading:'Foto klinis infeksi genital dan serviks',items:[
+   {url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'Contoh citra USG obstetri (bukan foto infeksi genital).'},
+   {url:'https://cdn.ncbi.nlm.nih.gov/pmc/blobs/daee/11654032/fee2d248476d/IANN_A_2442066_F0001_C.jpg',caption:'Foto klinis dermatologi dari publikasi akses terbuka; bukan gambaran spesifik serviks atau vagina.'}
+  ]},
+  {test:/Abortus|Kehamilan normal|Janin tumbuh lambat|FGR|Persalinan preterm|Bayi postmatur|Ketuban pecah dini|Hiperemesis gravidarum|Preeklampsia|Eklampsia|Infeksi pada kehamilan|TORCH|Anemia defisiensi besi pada kehamilan/i,heading:'Pencitraan obstetri',items:[
+   {url:'https://epos.myesr.org/posterimage/esr/ecr2019/148561/media/784308',caption:'USG transabdominal: contoh plasenta previa dan tanda abnormalitas implantasi plasenta. Bukan temuan untuk semua kondisi dalam kelompok ini.'},
+   {url:'https://cdn.mommd.gr/img/900/max/90/2016/04/18/1656100039709-993676791-2_3.jpg?t=ZoBSOw1MmVsYL8J5iT6ggg',caption:'Contoh USG transvaginal serviks pendek/funneling; dapat relevan pada penilaian risiko persalinan prematur.'},
+   {url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'Contoh citra USG obstetri pada evaluasi kehamilan awal.'}
+  ]},
+  {test:/Salpingitis|Penyakit radang panggul|Abses tubo-ovarium|Torsi dan ruptur kista ovarium/i,heading:'Pencitraan pelvis dan adneksa',items:[
+   {url:'https://media.springernature.com/lw685/springer-static/image/art%3A10.1007%2Fs00117-018-0475-4/MediaObjects/117_2018_475_Fig3_HTML.png',caption:'Contoh pencitraan pelvis untuk kelainan adneksa; interpretasi gambar harus mengikuti panel dan keterangan asli.'}
+  ]},
+  {test:/Mastitis|Cracked nipple|Inverted nipple/i,heading:'Gambaran payudara dan laktasi',items:[
+   {url:'https://imgbb.ru/frontend/posts/creation/2022-09-16/9shzij75i7ujjr1ido81c46knrz6b35ozmw.jpg',caption:'Contoh fisura puting pada ibu menyusui; bukan gambaran mastitis atau puting terbenam.'}
+  ]},
+  {test:/Prolaps tali pusat/i,heading:'Diagram kegawatdaruratan obstetri',items:[
+   {url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2019/01/m_butler_c41_f09.png?fit=520%2C477&ssl=1',caption:'Diagram prolaps tali pusat dan prinsip penanganan awal.'}
+  ]},
+  {test:/Retensi plasenta|Perdarahan postpartum|Inversio uterus|Subinvolusio uterus|Ruptur serviks|Ruptur perineum|Distosia|Partus lama|Hipoksia janin/i,heading:'Gambaran komplikasi persalinan dan postpartum',items:[
+   {url:'https://media.licdn.com/dms/image/v2/D5622AQGy3n-P5AbgCg/feedshare-shrink_800/B56ZtKT.hlJMAg-/0/1766478311859?e=2147483647&t=bzpCXsViS7rRSkf5iZGJLqY-70qUM2R_BARNSJTLMow&v=beta',caption:'Infografik PPH: 4T, tanda klinis, dan prinsip penanganan. Ini infografik, bukan foto pasien.'},
+   {url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2021/03/421078_1_En_37_Figd_HTML.png?fit=1200%2C1013&ssl=1',caption:'Contoh citra USG uterus untuk evaluasi sisa jaringan/retensi produk konsepsi.'}
+  ]}
  ];
- const found=visuals.find(v=>v.test.test(name));
- const cards=found?found.items.map(v=>'<figure style="margin:10px 0"><img src="'+v.url+'" alt="'+v.caption+'" loading="lazy" referrerpolicy="no-referrer" style="display:block;width:100%;max-height:380px;object-fit:contain;background:#fff;border:1px solid var(--line,#ddd);border-radius:12px" onerror="this.closest(\'figure\').style.display=\'none\'"><figcaption class="muted" style="font-size:12px;margin-top:6px">'+v.caption+' · '+v.source+'</figcaption></figure>').join(''):'<p class="muted">Foto klinis spesifik untuk diagnosis ini belum berhasil dipilih dari sumber yang dapat disematkan dengan aman. Aku tidak akan menampilkan foto penyakit lain seolah-olah itu gambaran diagnosis ini.</p>';
- return '<section class="study-ecg"><h3>🖼️ GAMBAR KLINIS / PEMERIKSAAN — '+name+'</h3>'+cards+'</section>';
+ const group=sets.find(x=>x.test.test(name));
+ const items=group?group.items:[];
+ const html=items.map(v=>'<figure style="margin:10px 0"><img src="'+v.url+'" alt="'+v.caption+'" loading="lazy" referrerpolicy="no-referrer" style="display:block;width:100%;max-height:360px;object-fit:contain;background:#fff;border:1px solid var(--line,#ddd);border-radius:12px" onerror="this.closest(\'figure\').style.display=\'none\'"><figcaption class="muted" style="font-size:12px;margin-top:6px">'+v.caption+'</figcaption></figure>').join('');
+ return '<section class="study-ecg"><h3>🖼️ '+(group?group.heading:'Gambar klinis / pemeriksaan')+' — '+name+'</h3>'+(html||'<p class="muted">Belum ada foto spesifik yang dapat disematkan dengan sumber terverifikasi untuk diagnosis ini. Aku tidak menampilkan gambar penyakit lain sebagai pengganti.</p>')+'</section>';
 }
 function openReproLesson(i){
  const l=reproLessons[i];if(!l)return;
