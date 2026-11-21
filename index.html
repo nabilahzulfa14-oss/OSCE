@@ -863,6 +863,78 @@ function diseaseSpecificFindingPanel(lesson){
  const points=studyBulletItems(section[1]);
  return '<section class="study-points"><h3>🔎 Temuan pemeriksaan yang mengarah ke '+lesson.title.replace(/^(4A|3A|3B) · /,'')+'</h3><p class="muted">Ini adalah pola/temuan yang dapat mendukung diagnosis, bukan hasil pasien simulasi. Cocokkan dengan anamnesis, pemeriksaan fisik, dan kriteria diagnosis.</p><ul>'+points.map(x=>'<li>'+x+'</li>').join('')+'</ul></section>';
 }
+function relevantReferenceRows(title,system,rows){
+ const t=String(title||'').toLowerCase();
+ const groups={
+ 'Respirasi':[
+  [/asma/,'SpO₂|Frekuensi napas|FEV₁\/FVC|Respons bronkodilator|Peak expiratory flow'],
+  [/ppok|emfisema/,'SpO₂|Frekuensi napas|FEV₁\/FVC|PaO₂|PaCO₂|HCO₃'],
+  [/pneumonia|tuberkulosis|bronkiolitis|pertusis|bronkitis|influenza/,'SpO₂|Frekuensi napas|pH darah|PaO₂|PaCO₂'],
+  [/pneumotoraks|efusi pleura|edema paru|ards|hemotoraks/,'SpO₂|Frekuensi napas|pH darah|PaO₂|PaCO₂|HCO₃'],
+  [/laringitis|faringitis|tonsilitis|sinusitis|rinitis|epiglotitis|pseudokroup/,'SpO₂|Frekuensi napas']
+ ],
+ 'Kardiovaskular':[
+  [/hipertensi/,'Tekanan darah|Kreatinin|Natrium|Kalium'],
+  [/infark miokard|angina|sindrom koroner/,'Tekanan darah|Frekuensi nadi|Troponin'],
+  [/gagal jantung|kardiomiopati/,'Tekanan darah|Frekuensi nadi|Natrium|Kalium|Kreatinin|BNP'],
+  [/fibrilasi atrium|flutter|takikardia|ekstrasistol|fibrilasi ventrikel|henti jantung/,'Tekanan darah|Frekuensi nadi|Kalium|Natrium'],
+  [/syok|kor pulmonale|tromboflebitis|limfangitis|limfedema|insufisiensi vena/,'Tekanan darah|Frekuensi nadi|Hemoglobin']
+ ],
+ 'Gastrointestinal':[
+  [/hepatitis|sirosis|kolestasis|ikterus/,'AST|ALT|Bilirubin|Albumin'],
+  [/pankreatitis/,'Lipase|Natrium|Kalium|Leukosit'],
+  [/perdarahan|ulkus|varises esofagus|hemoroid|anemia/,'Hemoglobin|Leukosit|Trombosit'],
+  [/apendisitis|kolesistitis|kolangitis|divertikulitis|peritonitis|abses/,'Leukosit|CRP|Bilirubin'],
+  [/diare|gastroenteritis|kolera|disentri|muntah|dehidrasi/,'Natrium|Kalium|Leukosit'],
+  [/cacing|askariasis|taeniasis|giardiasis|strongiloidiasis|amoebiasis/,'Hemoglobin|Leukosit'],
+  [/gastritis|dispepsia|refluks|gerd|konstipasi|hernia/,'Hemoglobin']
+ ],
+ 'Neurologi':[
+  [/meningitis|ensefalitis/,'CSF:|Leukosit darah|Glukosa|Natrium'],
+  [/stroke|perdarahan intrakranial|perdarahan subaraknoid/,'Glukosa|INR|Natrium'],
+  [/epilepsi|kejang|status epileptikus/,'Glukosa|Natrium|Kalium|Kalsium'],
+  [/neuropati|guillain|miastenia|parkinson|demensia|vertigo|nyeri kepala|migrain/,'Glukosa|Natrium|Kalsium']
+ ],
+ 'Psikiatri':[
+  [/depresi|gangguan mood|bipolar|psikosis|skizofrenia|gangguan cemas|panik/,'TSH|Glukosa|Natrium|Vitamin B₁₂|Hemoglobin']
+ ],
+ 'Endokrin & Metabolik':[
+  [/diabetes tipe 1|diabetes tipe 2|diabetes melitus|diabetes spesifik/,'Glukosa darah puasa|Glukosa 2 jam|Glukosa darah sewaktu|HbA1c'],
+  [/ketoasidosis diabetik|kad|hiperglikemik hiperosmolar|hhs/,'Glukosa darah sewaktu|β-hidroksibutirat|pH darah vena|Bikarbonat|Osmolalitas efektif|Natrium|Kalium'],
+  [/hipoglikemia/,'Glukosa darah sewaktu|Natrium|Kalium'],
+  [/hipoparatiroid/,'Kalsium total|Fosfat|PTH'],
+  [/hipertiroid|tirotoksikosis|badai tiroid|gondok|goiter/,'TSH|FT4'],
+  [/cushing|krisis adrenal|insufisiensi adrenal/,'Kortisol pagi|Natrium|Kalium'],
+  [/dislipidemia|sindrom metabolik|obesitas/,'LDL-C|HDL-C|Trigliserida|Glukosa darah puasa'],
+  [/hiperurisemia|gout/,'Asam urat'],
+  [/malnutrisi|defisiensi vitamin|defisiensi mineral/,'Kalsium total|Fosfat|Natrium|Kalium']
+ ],
+ 'Hematologi & Imunologi':[
+  [/anemia defisiensi besi/,'Hemoglobin|MCV|MCH|RDW|Ferritin'],
+  [/anemia hemolitik/,'Hemoglobin|MCV|Retikulosit|LDH|Bilirubin|Haptoglobin'],
+  [/anemia makrositik/,'Hemoglobin|MCV|MCH|Retikulosit'],
+  [/dengue|demam berdarah|syok dengue/,'Hemoglobin|Leukosit|Trombosit'],
+  [/malaria/,'Hemoglobin|Leukosit|Trombosit|Bilirubin'],
+  [/leptospirosis|sepsis|bakteremia/,'Hemoglobin|Leukosit|Trombosit|CRP|Kreatinin|Bilirubin'],
+  [/limfadenitis|limfadenopati|toksoplasmosis/,'Leukosit|Neutrofil|LED|CRP'],
+  [/lupus|les|artritis reumatoid|demam reumatik|polimialgia/,'Hemoglobin|Leukosit|Trombosit|LED|CRP'],
+  [/anafilaksis/,'Hemoglobin|Leukosit']
+ ]
+ };
+ const rules=groups[system]||[];
+ const rule=rules.find(x=>x[0].test(t));
+ if(!rule)return [];
+ const re=new RegExp(rule[1],'i');
+ return rows.filter(r=>re.test(String(r[0])));
+}
+function diagnosisKeyFromLesson(l){
+ if(!l||!Array.isArray(l.sections))return '';
+ const chosen=l.sections.filter(p=>/kunci diagnosis|diagnosis klinis|kriteria diagnosis|pemeriksaan penunjang|tanda dan gejala klinis/i.test(p[0]));
+ const points=[];
+ chosen.forEach(p=>studyBulletItems(p[1]).slice(0,/pemeriksaan penunjang/i.test(p[0])?3:2).forEach(x=>{if(!points.includes(x))points.push(x)}));
+ if(!points.length)return '';
+ return '<section class="study-key"><h3>🔑 KUNCI DIAGNOSIS — '+l.title.replace(/^(4A|3A|3B) · /,'')+'</h3><ul>'+points.slice(0,7).map(x=>'<li>'+x+'</li>').join('')+'</ul></section>';
+}
 function diagnosticResultPanel(title,system,lesson){
  const t=String(title||'').toLowerCase();
  const sets={
@@ -922,7 +994,9 @@ function diagnosticResultPanel(title,system,lesson){
  ['Hemoglobin (wanita tidak hamil)','<12,0','12,0–15,0','>15,0','g/dL']
  ]
  };
- const rows=sets[system]||sets['Neurologi'];
+ const allRows=sets[system]||sets['Neurologi'];
+ const rows=relevantReferenceRows(title,system,allRows);
+ if(!rows.length)return diseaseSpecificFindingPanel(lesson);
  const htmlRows=rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('');
  return '<section class="study-points"><h3>📏 Nilai rujukan pemeriksaan penunjang</h3><p class="muted">Ini adalah nilai rujukan umum dewasa, bukan hasil pasien simulasi. Rentang dapat berbeda antar laboratorium, metode, usia, jenis kelamin, kehamilan, dan kondisi klinis.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi</th><th>Satuan</th></tr></thead><tbody>'+htmlRows+'</tbody></table></div><p class="muted">Catatan untuk '+system+': '+(system==='Respirasi'?'Nilai spirometri harus dibandingkan dengan LLN atau nilai prediksi individual; tidak memakai satu angka FEV₁/FVC normal untuk semua usia.':'Gunakan rentang rujukan yang tercantum pada hasil laboratorium setempat. Penanda tinggi/rendah tidak otomatis menetapkan diagnosis.')+'</p></section>'+diseaseSpecificFindingPanel(lesson);
 }
@@ -1887,7 +1961,7 @@ const endocrineLessons=endocrineRows.map(r=>({title:r[0]+' · '+r[1],sub:'Materi
 ['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],...highYieldDiagnosisSections(r[3],r[4],r[5]),['Pemeriksaan fisik dan temuan khas',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana awal dan rujukan',r[7]],['Edukasi, komplikasi, dan tindak lanjut',r[8]],['Kompetensi SKDI',r[0]+' — klasifikasi kompetensi mengikuti daftar penyakit SKDI 2012; kegawatdaruratan harus distabilisasi dan dirujuk.']
 ]}));
 function endocrineResultPanel(l){
- const rows=[
+ const allRows=[
  ['Glukosa darah puasa','<70','70–99','100–125: prediabetes; ≥126: diabetes bila terkonfirmasi','mg/dL'],
  ['Glukosa 2 jam TTGO','<70 dapat hipoglikemia','<140','140–199: prediabetes; ≥200: diabetes','mg/dL'],
  ['Glukosa darah sewaktu','<70: hipoglikemia','Tidak ada rentang puasa/nonpuasa tunggal','≥200 + gejala klasik dapat memenuhi kriteria diabetes','mg/dL'],
@@ -1909,12 +1983,14 @@ function endocrineResultPanel(l){
  ['Trigliserida','—','<150','150–499 tinggi; ≥500 sangat tinggi','mg/dL'],
  ['Asam urat','Pria <3,5; wanita <2,5 (kisaran lab bervariasi)','Pria ±3,5–7,2; wanita ±2,5–6,0','Di atas batas atas lab','mg/dL']
  ];
- return '<section class="study-points"><h3>📏 Nilai rujukan pemeriksaan penunjang endokrin & metabolik</h3><p class="muted">Nilai rujukan umum dewasa; bukan hasil pasien simulasi. Batas diagnosis diabetes, KAD, HHS, dan gangguan endokrin mengikuti kriteria klinis, bukan sekadar penanda tinggi/rendah. Rentang laboratorium dapat berbeda menurut metode.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi / batas penting</th><th>Satuan</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="muted">Untuk interpretasi khusus diagnosis '+l.title+', cocokkan dengan gejala, pemeriksaan fisik, kriteria diagnostik, dan rentang rujukan laboratorium setempat.</p></section>'+diseaseSpecificFindingPanel(l);
+ const rows=relevantReferenceRows(l.title,'Endokrin & Metabolik',allRows);
+ if(!rows.length)return diseaseSpecificFindingPanel(l);
+ return '<section class="study-points"><h3>📏 Nilai rujukan yang relevan untuk diagnosis ini</h3><p class="muted">Nilai rujukan umum dewasa; bukan hasil pasien simulasi. Batas diagnosis diabetes, KAD, HHS, dan gangguan endokrin mengikuti kriteria klinis, bukan sekadar penanda tinggi/rendah. Rentang laboratorium dapat berbeda menurut metode.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi / batas penting</th><th>Satuan</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="muted">Untuk interpretasi khusus diagnosis '+l.title+', cocokkan dengan gejala, pemeriksaan fisik, kriteria diagnostik, dan rentang rujukan laboratorium setempat.</p></section>'+diseaseSpecificFindingPanel(l);
 }
 function openEndocrineLesson(i){
  const l=endocrineLessons[i];if(!l)return;
  document.querySelectorAll('#studyList .study-item').forEach(b=>b.classList.toggle('active',Number(b.dataset.lesson)===i));
- const key='<section class="study-key"><h3>🔑 KUNCI OSCE</h3><ul><li>Kenali kegawatan lebih dulu: perubahan kesadaran, syok, dehidrasi berat, napas Kussmaul, kejang atau aritmia.</li><li>Pastikan pemeriksaan awal yang tepat: glukosa bedside, tanda vital, status hidrasi dan EKG bila berindikasi.</li><li>Interpretasikan hasil bersama gejala dan pemeriksaan fisik; jangan menegakkan diagnosis dari satu angka yang tidak sesuai konteks.</li></ul></section>';
+ const key=diagnosisKeyFromLesson(l)||'<section class="study-key"><h3>🔑 KUNCI OSCE</h3><ul><li>Gunakan kriteria diagnosis dan temuan khas yang tercantum pada materi diagnosis ini.</li><li>Singkirkan kegawatan dan diagnosis banding yang mengubah tata laksana.</li></ul></section>';
  $('studyDetail').innerHTML='<div class="tag">STASE ENDOKRIN & METABOLIK · SKDI 2012</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+key+diagnosisInlineImage(l.title,'Endokrin & Metabolik')+endocrineResultPanel(l)+l.sections.map(p=>'<section class="study-points"><h3>'+p[0]+'</h3><ul>'+studyBulletItems(p[1]).map(x=>'<li>'+x+'</li>').join('')+'</ul></section>').join('')+prescriptionStudyBlock(l.title,'Endokrin & Metabolik')+'<section class="study-points"><h3>Referensi belajar</h3><ul><li><a href="https://pd.fk.ub.ac.id/wp-content/uploads/2013/08/KKI-SKDI-2012.pdf" target="_blank" rel="noopener">Konsil Kedokteran Indonesia — SKDI 2012</a></li><li><a href="https://diabetesjournals.org/care/issue/49/Supplement_1" target="_blank" rel="noopener">ADA — Standards of Care in Diabetes 2026</a></li><li><a href="https://www.endocrine.org/clinical-practice-guidelines" target="_blank" rel="noopener">Endocrine Society — Clinical Practice Guidelines</a></li><li><a href="https://www.who.int/health-topics/obesity" target="_blank" rel="noopener">WHO — Obesity and overweight</a></li></ul><p class="muted">Kriteria diabetes dan krisis hiperglikemik mengikuti ADA 2026; untuk praktik klinis tetap utamakan pedoman nasional, protokol fasilitas dan konsultasi spesialis.</p></section>';
 }
 function renderEndocrineList(){
@@ -1949,7 +2025,7 @@ const hematologyLessons=hematologyRows.map(r=>({title:r[0]+' · '+r[1],sub:'Mate
 ['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],['Pemeriksaan fisik dan temuan khas',r[4]],['Pemeriksaan penunjang dan hasil yang mengarah ke diagnosis',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana awal dan rujukan',r[7]],['Edukasi, komplikasi, dan tindak lanjut',r[8]],['Kompetensi SKDI','Tingkat '+r[0]+' sesuai daftar penyakit Sistem Hematologi dan Imunologi SKDI 2012. Pada kondisi gawat darurat lakukan stabilisasi awal dan rujuk sesuai kemampuan fasilitas.']
 ]}));
 function hematologyReferencePanel(l){
- const rows=[
+ const allRows=[
  ['Hemoglobin pria dewasa','<13,0','13,0–17,0','>17,0','g/dL'],
  ['Hemoglobin wanita dewasa tidak hamil','<12,0','12,0–15,0','>15,0','g/dL'],
  ['MCV','<80 (mikrositik)','80–100','>100 (makrositik)','fL'],
@@ -1969,12 +2045,14 @@ function hematologyReferencePanel(l){
  ['PT/INR','PT memanjang / INR <0,8 dapat abnormal sesuai lab','INR ±0,8–1,2 tanpa antikoagulan','PT/INR memanjang: evaluasi koagulasi/obat/hati','—'],
  ['aPTT','Memendek sesuai lab','±25–35','Memanjang: evaluasi faktor/antikoagulan','detik']
  ];
- return '<section class="study-points"><h3>📏 Nilai rujukan hematologi & imunologi</h3><p class="muted">Nilai umum dewasa untuk orientasi belajar. Rentang bergantung laboratorium, usia, jenis kelamin, kehamilan, metode dan kondisi klinis. Ferritin dapat tampak normal/tinggi saat inflamasi meskipun besi fungsional rendah.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi / batas penting</th><th>Satuan</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="muted">Gunakan nilai rujukan yang tercetak pada laboratorium setempat. Diagnosis tidak ditentukan dari satu parameter saja.</p></section>'+diseaseSpecificFindingPanel(l);
+ const rows=relevantReferenceRows(l.title,'Hematologi & Imunologi',allRows);
+ if(!rows.length)return diseaseSpecificFindingPanel(l);
+ return '<section class="study-points"><h3>📏 Nilai rujukan yang relevan untuk diagnosis ini</h3><p class="muted">Nilai umum dewasa untuk orientasi belajar. Rentang bergantung laboratorium, usia, jenis kelamin, kehamilan, metode dan kondisi klinis. Ferritin dapat tampak normal/tinggi saat inflamasi meskipun besi fungsional rendah.</p><div style="overflow-x:auto"><table><thead><tr><th>Pemeriksaan</th><th>Rendah</th><th>Normal / rujukan</th><th>Tinggi / batas penting</th><th>Satuan</th></tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="muted">Gunakan nilai rujukan yang tercetak pada laboratorium setempat. Diagnosis tidak ditentukan dari satu parameter saja.</p></section>'+diseaseSpecificFindingPanel(l);
 }
 function openHematologyLesson(i){
  const l=hematologyLessons[i];if(!l)return;
  document.querySelectorAll('#studyList .study-item').forEach(b=>b.classList.toggle('active',Number(b.dataset.lesson)===i));
- $('studyDetail').innerHTML='<div class="tag">STASE HEMATOLOGI & IMUNOLOGI · SKDI 2012</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+hematologyReferencePanel(l)+l.sections.map(p=>'<section class="study-points"><h3>'+p[0]+'</h3><ul>'+studyBulletItems(p[1]).map(x=>'<li>'+x+'</li>').join('')+'</ul></section>').join('')+prescriptionStudyBlock(l.title,'Hematologi & Imunologi')+'<section class="study-points"><h3>Referensi belajar</h3><ul><li><a href="https://kki.go.id/uploads/media/1683689635_fa3dea59333025ae148a.pdf" target="_blank" rel="noopener">Konsil Kedokteran Indonesia — SKDI 2012, Sistem Hematologi dan Imunologi</a></li><li><a href="https://jdih.kemkes.go.id/pdfjs/web/viewer.html?file=https://jdih.kemkes.go.id/storage/documents/pdfs/2020kepmenkes9845.pdf" target="_blank" rel="noopener">Kemenkes — PNPK Tata Laksana Infeksi Dengue pada Dewasa (2020)</a></li><li><a href="https://keslan.kemkes.go.id/produkhukum?id=2" target="_blank" rel="noopener">Kemenkes — daftar PNPK, termasuk malaria dan hemofilia</a></li><li><a href="https://reumatologi.or.id/wp-content/uploads/2025/08/Pedoman-Diagnosis-dan-Pengelolaan-Lupus-Eritematosus-Sistemik.pdf" target="_blank" rel="noopener">Perhimpunan Reumatologi Indonesia — Pedoman Diagnosis dan Pengelolaan LES</a></li></ul><p class="muted">SKDI menentukan tingkat kompetensi; keputusan klinis dan terapi harus mengikuti PNPK/pedoman nasional terbaru, kondisi pasien, dan kewenangan fasilitas.</p></section>';
+ $('studyDetail').innerHTML='<div class="tag">STASE HEMATOLOGI & IMUNOLOGI · SKDI 2012</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+diagnosisKeyFromLesson(l)+hematologyReferencePanel(l)+l.sections.map(p=>'<section class="study-points"><h3>'+p[0]+'</h3><ul>'+studyBulletItems(p[1]).map(x=>'<li>'+x+'</li>').join('')+'</ul></section>').join('')+prescriptionStudyBlock(l.title,'Hematologi & Imunologi')+'<section class="study-points"><h3>Referensi belajar</h3><ul><li><a href="https://kki.go.id/uploads/media/1683689635_fa3dea59333025ae148a.pdf" target="_blank" rel="noopener">Konsil Kedokteran Indonesia — SKDI 2012, Sistem Hematologi dan Imunologi</a></li><li><a href="https://jdih.kemkes.go.id/pdfjs/web/viewer.html?file=https://jdih.kemkes.go.id/storage/documents/pdfs/2020kepmenkes9845.pdf" target="_blank" rel="noopener">Kemenkes — PNPK Tata Laksana Infeksi Dengue pada Dewasa (2020)</a></li><li><a href="https://keslan.kemkes.go.id/produkhukum?id=2" target="_blank" rel="noopener">Kemenkes — daftar PNPK, termasuk malaria dan hemofilia</a></li><li><a href="https://reumatologi.or.id/wp-content/uploads/2025/08/Pedoman-Diagnosis-dan-Pengelolaan-Lupus-Eritematosus-Sistemik.pdf" target="_blank" rel="noopener">Perhimpunan Reumatologi Indonesia — Pedoman Diagnosis dan Pengelolaan LES</a></li></ul><p class="muted">SKDI menentukan tingkat kompetensi; keputusan klinis dan terapi harus mengikuti PNPK/pedoman nasional terbaru, kondisi pasien, dan kewenangan fasilitas.</p></section>';
 }
 function renderHematologyList(){
  sortStudyByLevel(hematologyLessons);
