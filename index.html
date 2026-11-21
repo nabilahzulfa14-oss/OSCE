@@ -628,7 +628,7 @@ const studyPearls={
 };
 function openStudy(i){
  const d=diseaseBank[i];if(!d)return;
- const map={'Asma bronkial':'asma','Infark miokard':'stemi','Kejang demam':'febrile','Pneumonia, bronkopneumonia':'pneumonia','Diabetes melitus tipe 2':'dm','Demam dengue, DHF':'dengue','Impetigo':'impetigo','Infeksi saluran kemih':'uti','Anemia defisiensi besi':'ida','Stroke':'stroke','Apendisitis akut':'appendicitis'};
+ const map={'Asma bronkial':'asma','Infark miokard':'stemi','Kejang demam':'febrile','Pneumonia, bronkopneumonia':'pneumonia','Diabetes melitus tipe 2':'dm','Demam dengue, DHF':'dengue','Impetigo':'impetigo','Infeksi saluran kemih':'uti','Anemia defisiensi besi':'ida','Stroke':'stroke','Infark serebral':'stroke','Apendisitis akut':'appendicitis'};
  const id=map[d.name],c=id?cases.find(x=>x.id===id):null,p=id?studyPearls[id]:null;
  let body='<div class="study-note"><b>Peta kompetensi SKDI 2012:</b> '+d.spec+' · tingkat '+d.level+'. Tingkat kompetensi menunjukkan kemampuan dokter umum yang diharapkan, bukan tingkat keparahan pasien.</div>';
  if(c&&p){
