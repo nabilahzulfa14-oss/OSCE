@@ -792,7 +792,7 @@ function renderCatalog(){
  $('catalogCount').textContent=filtered.length+' penyakit SKDI • '+playable+' skenario terkurasi siap dimainkan';
  $('catalogList').innerHTML=filtered.map(d=>{const ready=curatedNames.has(d.name);return '<button class="catalog-item" onclick="'+(ready?'playDisease('+d.index+')':'openStudy('+d.index+')')+'" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · '+(ready?'Skenario terkurasi — mulai latihan':'Materi klinis belum lengkap — lihat status')+'</small></span><span class="tag '+(ready?'green':'')+'">'+d.level+'</span></button>'}).join('');
 }
-[...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>{$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>');$('studySpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>')});$('studySpec').onchange=renderStudyList;$('studyLevel').onchange=renderStudyList;$('studySearch').oninput=renderStudyList;
+[...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>{$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>')});$('studySpec').onchange=renderStudyList;$('studyLevel').onchange=renderStudyList;$('studySearch').oninput=renderStudyList;
 $('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
 renderCatalog();
 
