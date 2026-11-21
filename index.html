@@ -1741,9 +1741,16 @@ const reproRows = [
 ['3B','Subinvolusio uterus','Uterus mengecil lebih lambat dari yang diharapkan setelah persalinan, sering berkaitan dengan sisa jaringan atau infeksi.','Perdarahan postpartum berkepanjangan/berulang, lokia menetap, nyeri atau demam bila infeksi.','Fundus lebih tinggi/besar dan lunak dibanding perkiraan masa nifas; uterus nyeri bila endometritis, lokia dapat berbau.','Pemeriksaan klinis dan USG pelvis untuk sisa produk konsepsi/kelainan kavum; CBC untuk anemia, tes infeksi sesuai gejala.','Involusi normal: ukuran uterus turun progresif dan lokia berkurang. Endometritis: demam/nyeri/lochia berbau. Retained products: perdarahan dan massa/vascularity pada USG.','Cari dan tangani penyebab: antibiotik bila endometritis, tata laksana sisa jaringan oleh obstetri, koreksi anemia dan kontrol perdarahan.','Edukasi tanda bahaya perdarahan banyak, demam, bau busuk atau pusing; kontrol nifas.'],
 ['3B','Torsi dan ruptur kista ovarium','Torsi ovarium/adneksa menyebabkan gangguan aliran darah; ruptur kista dapat menyebabkan nyeri akut dan perdarahan intraperitoneal.','Nyeri perut bawah mendadak unilateral, mual muntah; ruptur dapat muncul setelah aktivitas/hubungan seksual. Tanyakan HPHT dan kemungkinan hamil.','Nyeri tekan/adneksa, guarding bila iritasi peritoneum; nilai hemodinamik, pucat dan tanda syok.','Tes kehamilan wajib; USG transvaginal: ovarium membesar/edema, folikel perifer, pedikel berputar (whirlpool); Doppler aliran abnormal mendukung tetapi aliran normal tidak menyingkirkan torsi. Hemoglobin serial bila perdarahan.','Kehamilan ektopik: β-hCG positif dan lokasi kehamilan abnormal. Apendisitis: nyeri RLQ dan evaluasi abdomen. PID/abses: demam/keputihan dan tanda infeksi.','Torsi adalah emergensi bedah—konsultasi ginekologi segera, jangan menunda untuk menunggu Doppler bila kecurigaan tinggi. Ruptur dengan instabilitas/perdarahan perlu resusitasi dan tindakan.','Segera ke IGD bila nyeri mendadak, muntah, pingsan atau perdarahan; jangan mengobati sendiri dengan analgesik sambil menunda evaluasi.']
 ];
+function highYieldDiagnosisSections(clinical,physical,tests){
+ const c=studyBulletItems(clinical),p=studyBulletItems(physical),t=studyBulletItems(tests);
+ return [
+  ['Temuan khas yang perlu dikenali',[...c.slice(0,2),...p.slice(0,1)].filter(Boolean).join('; ')],
+  ['Kunci diagnosis',[...t.slice(0,2)].filter(Boolean).join('; ')]
+ ];
+}
 function buildReproLessons(){
  return reproRows.map(r=>({title:r[0]+' · '+r[1],sub:'Materi diagnosis individual sesuai SKDI 2012',sections:[
- ['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],['Pemeriksaan fisik dan temuan khas',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana',r[7]],['Edukasi, komplikasi dan rujukan',r[8]],...(r[9]?[['Contoh resep / catatan terapi',r[9]]]:[])
+ ['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],...highYieldDiagnosisSections(r[3],r[4],r[5]),['Pemeriksaan fisik dan temuan khas',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana',r[7]],['Edukasi, komplikasi dan rujukan',r[8]],...(r[9]?[['Contoh resep / catatan terapi',r[9]]]:[])
  ]}));
 }
 const reproLessons=buildReproLessons();
@@ -1813,7 +1820,7 @@ const renalRows=[
 ['3A','Chancroid','Infeksi menular seksual oleh Haemophilus ducreyi yang menyebabkan ulkus genital nyeri dan limfadenitis inguinal.','Ulkus genital nyeri, dasar kotor/nekrotik, tepi tidak teratur; dapat ada bubo inguinal nyeri.','Ulkus dangkal nyeri, mudah berdarah; kelenjar inguinal dapat membesar/fluktuatif.','Diagnosis klinis setelah menyingkirkan sifilis dan herpes; NAAT/kultur H. ducreyi bila tersedia. Tes sifilis dan HSV dilakukan untuk eksklusi; tidak ada tes rutin tunggal yang selalu tersedia.','Sifilis primer: ulkus keras tidak nyeri, dasar bersih, serologi dapat positif sesuai fase. Herpes genital: vesikel berkelompok/ulkus multipel nyeri, PCR HSV.','Antibiotik sesuai pedoman IMS, evaluasi dan tata laksana pasangan, skrining IMS lain; aspirasi bubo bila perlu oleh klinisi.','Hindari hubungan seksual sampai terapi dan lesi sembuh serta pasangan dievaluasi.']
 ];
 const renalLessons=renalRows.map(r=>({title:r[0]+' · '+r[1],sub:r[2],sections:[
-['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],['Pemeriksaan fisik: langkah dan temuan',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana awal dan rujukan',r[7]],['Edukasi, komplikasi, dan tindak lanjut',r[8]],['Kompetensi SKDI',r[0]+' — kompetensi dokter umum sesuai SKDI 2012. Tingkat kompetensi tidak menggantikan penilaian kegawatan dan kebutuhan rujukan.']
+['Definisi',r[2]],['Tanda dan gejala klinis',r[3]],...highYieldDiagnosisSections(r[3],r[4],r[5]),['Pemeriksaan fisik: langkah dan temuan',r[4]],['Pemeriksaan penunjang dan hasil yang diharapkan',r[5]],['Diagnosis banding dan pembeda',r[6]],['Tatalaksana awal dan rujukan',r[7]],['Edukasi, komplikasi, dan tindak lanjut',r[8]],['Kompetensi SKDI',r[0]+' — kompetensi dokter umum sesuai SKDI 2012. Tingkat kompetensi tidak menggantikan penilaian kegawatan dan kebutuhan rujukan.']
 ]}));
 function renalResultPanel(l){
  const tests=l.sections.find(x=>x[0].startsWith('Pemeriksaan penunjang'))?.[1]||'';
