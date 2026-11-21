@@ -1161,18 +1161,94 @@ stroke:'<g stroke="#23344d" stroke-width="5" fill="none" stroke-linecap="round">
 return base+(diagrams[kind]||diagrams.motor)+'</svg>';
 }
 function neuroVisualBlock(l){
-const k=l.kind||'motor';const labels={cranial:'Pemeriksaan saraf kranialis',meningeal:'Pemeriksaan rangsang meningeal: Kernig dan Brudzinski',motor:'Pemeriksaan kekuatan dan refleks motorik',coord:'Pemeriksaan koordinasi serebelar',spine:'Pemetaan dermatom dan miotom',vestibular:'Pemeriksaan vestibular',cognitive:'Pemeriksaan status mental dan kognitif',sensory:'Pemeriksaan sensorik saraf perifer',stroke:'Pemeriksaan neurologis pasien stroke'};
-const images={
-cranial:[['https://cdn.prod.website-files.com/6011a994ad210082aa98b668/606d9458a8e11657a503842d_oculomotor-examination.jpeg','Pemeriksaan gerak bola mata untuk saraf III, IV, dan VI','Medistudents'],['https://uploads-ssl.webflow.com/6011a994ad210082aa98b668/606d945845c22520c140cc76_sensory-branch-test-on-the-forehead.jpeg','Pemeriksaan sensibilitas cabang V1 nervus trigeminus','Medistudents']],
-meningeal:[['https://o.quizlet.com/8zF6m63xnlsN8Y5tbg1rAA.png','Posisi pemeriksaan Kernig dan Brudzinski','Ilustrasi pemeriksaan tanda rangsang meningeal']],
-motor:[['https://www.oscesup.com/cdn/shop/files/upper-limb-exam.png?v=1754342932&width=1445','Pemeriksaan refleks tendon dengan palu refleks','OSCE Sup'],['https://img.brainkart.com/imagebk33/7UWyvzH.jpg','Contoh lokasi pemeriksaan refleks biseps, triseps, patela dan Achilles','BrainKart']],
-coord:[['https://img.kango-roo.com/upload/images/scio/syoujyouQA/kaitei/syo30_04_02.png','Tes koordinasi finger-to-nose dan heel-to-shin','Kango-roo']],
-sensory:[['https://uploads-ssl.webflow.com/6011a994ad210082aa98b668/606d945845c22520c140cc76_sensory-branch-test-on-the-forehead.jpeg','Uji raba ringan pada distribusi nervus trigeminus','Medistudents'],['https://rlv.zcache.com.br/dermatomos_myotomes_e_poster_dtr_chiropractic-r398e91b1a8bd45b6bc69aa62c9f983dc_wv4_8byvr_644.webp','Peta dermatom dan miotom tubuh','Poster referensi dermatom']],
-spine:[['https://rlv.zcache.com.br/dermatomos_myotomes_e_poster_dtr_chiropractic-r398e91b1a8bd45b6bc69aa62c9f983dc_wv4_8byvr_644.webp','Peta dermatom dan miotom','Poster referensi dermatom']],
-vestibular:[['https://cdn.lecturio.com/assets/Testing-cochlear-function-CN-VIII-1536x842.jpg','Pemeriksaan fungsi vestibulokoklear dengan garpu tala','Lecturio']]
-};
-const chosen=images[k]||[];
-return '<section class="study-ecg"><h3>Foto pemeriksaan klinis: '+(labels[k]||labels.motor)+'</h3><div class="study-visual-grid">'+chosen.map(x=>'<figure class="study-visual"><img loading="lazy" src="'+x[0]+'" alt="'+x[1]+'" style="width:100%;height:auto;max-height:340px;object-fit:contain;border-radius:10px"><figcaption>'+x[1]+'<br><small>Sumber: '+x[2]+'</small></figcaption></figure>').join('')+'</div><p class="muted">Gambar menunjukkan teknik/posisi pemeriksaan. Cocokkan dengan uraian langkah, respons normal, temuan abnormal, dan interpretasinya di bagian pemeriksaan fisik.</p></section>';
+ const title=l.title.replace(/^(4A|3A|3B) · /,'').toLowerCase();
+ const make=(url,caption,source)=>({url,caption,source});
+ const stanford='https://med.stanford.edu/stanfordmedicine25/the25/carpaltunnel.html';
+ let heading='Gambaran pemeriksaan yang sesuai diagnosis';
+ let imgs=[];
+ let focus='';
+ if(title.includes('carpal tunnel')){
+  heading='Carpal tunnel syndrome — pemeriksaan nervus medianus';
+  imgs=[
+   make('https://stanfordmedicine25.stanford.edu/the25/carpaltunnel/_jcr_content/main/panel_builder_0/panel_0/panel_builder/panel_0/image_1150556380.img.620.high.png/Modified-Phalen_s.png','Phalen test: fleksi pergelangan dipertahankan; positif bila parestesia muncul pada distribusi medianus.',stanford),
+   make('https://stanfordmedicine25.stanford.edu/the25/carpaltunnel/_jcr_content/main/panel_builder_0/panel_0/panel_builder/panel_0/panel_builder_294781370/panel_0/image.img.620.high.png/Carpal-Compression-Test.png','Durkan / carpal compression test: tekanan pada terowongan karpal; positif bila gejala medianus tereproduksi.',stanford)
+  ];
+  focus='Periksa sensasi ibu jari, telunjuk, jari tengah dan separuh radial jari manis; bandingkan eminensia thenar (sering terjaga), kekuatan abduksi/oposisi ibu jari dan atrofi thenar. Tinel dilakukan dengan mengetuk di atas nervus medianus pada pergelangan; Phalen dan Durkan membantu memprovokasi gejala. Hasil satu tes saja tidak cukup untuk menegakkan diagnosis.';
+ } else if(title.includes('tarsal tunnel')){
+  heading='Tarsal tunnel syndrome — nervus tibialis posterior';
+  imgs=[make('https://neuros.ru/images/lechenie/perifericheskie-nervy/funkcionalnye-narusheniya/sindrom-tarzalnogo-kanala/sindrom-tarzalnogo-kanala-3.jpg','Tinel di belakang maleolus medialis: parestesia/nyeri menjalar ke telapak kaki menunjukkan iritasi nervus tibialis posterior.','https://neuros.ru/lechenie/perifericheskie-nervy/funkcionalnye-narusheniya/sindrom-tarzalnogo-kanala/')];
+  focus='Fokus pada Tinel di belakang maleolus medialis, nyeri tekan terowongan tarsal, sensasi telapak kaki, bentuk arkus kaki, serta reproduksi gejala dengan dorsifleksi-eversi. Jangan gunakan tes Phalen tangan untuk diagnosis ini.';
+ } else if(title.includes('bppv')){
+  heading='BPPV — uji Dix–Hallpike';
+  imgs=[make('https://www.researchgate.net/publication/47742472/figure/fig1/AS%3A11431281122690496%401677516637482/Illustration-of-the-Dix-Hallpike-test-being-performed-on-a-patient-suspected-of-having.jpg','Dix–Hallpike: posisi kepala dan badan untuk memprovokasi vertigo serta nistagmus kanal posterior.','https://www.researchgate.net/figure/Illustration-of-the-Dix-Hallpike-test-being-performed-on-a-patient-suspected-of-having_fig1_47742472')];
+  focus='Amati nistagmus setelah perubahan posisi: latensi singkat, pola torsional-upbeat dan fatigabilitas mendukung BPPV kanal posterior. Pastikan tidak ada tanda neurologis sentral.';
+ } else if(title.includes('bell')){
+  heading='Bell’s palsy — pemeriksaan nervus fasialis';
+  imgs=[make('https://ingeniusua.org/sites/default/files/inline-images/bellspalsyphotos.jpg','Asimetri wajah saat istirahat, menutup mata kuat, dan menggerakkan otot wajah pada paresis fasialis perifer.','https://ingeniusua.org/articles/paralich-bella-abo-hostryy-peryferichnyy-paralich-lytsevoho-nervu')];
+  focus='Bandingkan kerutan dahi, penutupan mata rapat, lipatan nasolabial, senyum dan tiupan pipi. Lesi perifer mengenai dahi dan wajah bawah pada sisi yang sama; defisit anggota gerak atau gangguan bicara mengarah ke penyebab sentral.';
+ } else if(title.includes('parkinson')){
+  heading='Penyakit Parkinson — temuan motorik khas';
+  imgs=[make('https://tmedweb.tulane.edu/pharmwiki/lib/exe/fetch.php/neuroexam2.png','Temuan bradikinesia, gangguan gerak berulang, dan instabilitas postural pada pemeriksaan Parkinson.','https://tmedweb.tulane.edu/pharmwiki/doku.php/parkinson_disease_-_pathophysiology_treatment')];
+  focus='Cari bradikinesia (finger tapping makin kecil/lambat), rigiditas roda gigi, tremor istirahat 4–6 Hz, langkah kecil, berkurangnya ayunan lengan dan gangguan postural. Tremor saja tidak cukup untuk diagnosis.';
+ } else if(title.includes('radicular')||title.includes('hernia nukleus')||title.includes('referred pain')){
+  heading='Radikulopati / HNP — pemeriksaan tension sign';
+  imgs=[make('https://wikism.org/w/images/d/d6/Lasegue_test.jpg','Straight-leg-raise / Lasègue: reproduksi nyeri radikular menjalar saat tungkai lurus diangkat.','https://wikism.org/Straight_Leg_Raise_Test')];
+  focus='Nilai distribusi nyeri dermatomal, kekuatan miotom, refleks patela/Achilles, sensasi, gait dan straight-leg-raise. Nyeri radikular yang menjalar di bawah lutut lebih bermakna daripada nyeri punggung lokal saja.';
+ } else if(title.includes('guillain')){
+  heading='Guillain–Barré syndrome — pemeriksaan refleks dan kekuatan';
+  imgs=[make('https://res.cloudinary.com/dk0z4ums3/image/upload/v1633060619/attached_image/penyakit/neurologi/sindrom-guillian-barre/diagnosis.jpg','Pemeriksaan refleks Achilles; pada GBS refleks tendon dalam sering menurun atau menghilang.','https://www.alomedika.com/penyakit/neurologi/sindrom-guiilian-barre/diagnosis')];
+  focus='Dokumentasikan kekuatan otot secara serial, tonus, refleks tendon dalam (sering arefleksia), sensorik, saraf kranialis, kemampuan menelan, batuk, frekuensi napas dan kapasitas vital bila tersedia. Waspadai kelemahan progresif dan disautonomia.';
+ } else if(title.includes('miastenia')){
+  heading='Miastenia gravis — uji fatigabilitas / ice-pack test';
+  imgs=[make('https://image.slidesharecdn.com/ocular-myasthenia-gravis-201118183824/75/Ocular-myasthenia-gravis-18-2048.jpg','Ice-pack test: perbaikan ptosis sementara setelah kompres dingin mendukung miastenia okular.','https://www.slideshare.net/slideshow/ocular-myasthenia-gravis-239321180/239321180')];
+  focus='Nilai ptosis dan diplopia yang memburuk saat aktivitas berulang, perbaikan setelah istirahat, kekuatan otot bulbar dan leher. Ice-pack test dapat membantu pada ptosis; nilai fungsi napas dan menelan karena krisis miastenik merupakan kegawatdaruratan.';
+ } else if(/meningitis|ensefalitis/.test(title)){
+  heading='Meningitis / ensefalitis — tanda rangsang meningeal';
+  imgs=[make('https://o.quizlet.com/8zF6m63xnlsN8Y5tbg1rAA.png','Ilustrasi pemeriksaan Kernig dan Brudzinski; hasil positif mendukung iritasi meningeal.','https://www.ncbi.nlm.nih.gov/books/NBK519得/')];
+  focus='Cari kaku kuduk, Kernig/Brudzinski, fotofobia, perubahan kesadaran, kejang dan defisit fokal. Tanda meningeal dapat tidak muncul, terutama pada bayi, lansia, atau pasien imunokompromais.';
+ } else if(/stroke|infark serebral|hematom intraserebral|perdarahan subaraknoid|ensefalopati hipertensi/.test(title)){
+  heading='Stroke / lesi vaskular otak — pemeriksaan neurologis fokal';
+  imgs=[make('https://ingeniusua.org/sites/default/files/inline-images/bellspalsyphotos.jpg','Asimetri wajah sebagai salah satu komponen pemeriksaan wajah; lengkapi dengan lengan, tungkai, bicara, lapang pandang dan koordinasi.','https://www.stroke.org/en/about-stroke/stroke-symptoms')];
+  focus='Gunakan FAST/BE-FAST, nilai GCS, pupil, deviasi pandang, lapang pandang, paresis dan sensibilitas sisi tubuh, bahasa, disartria, koordinasi serta tanda peningkatan tekanan intrakranial. Pencitraan CT kepala nonkontras diperlukan untuk membedakan perdarahan dan iskemia.';
+ } else if(title.includes('demensia')||title.includes('amnesia')){
+  heading='Gangguan kognitif — pemeriksaan fungsi kognitif';
+  imgs=[];
+  focus='Dokumentasikan orientasi, atensi, registrasi dan recall, bahasa, fungsi visuospasial, fungsi eksekutif dan aktivitas sehari-hari. Gunakan instrumen skrining yang sesuai (misalnya MMSE/MoCA); nilai delirium dan depresi sebagai diagnosis banding.';
+ } else if(title.includes('epilepsi')||title.includes('kejang')||title.includes('status epileptikus')){
+  heading='Kejang — pemeriksaan pascakejang dan evaluasi neurologis';
+  imgs=[];
+  focus='Setelah stabil, nilai kesadaran/GCS, pupil, tanda trauma, defisit fokal/Todd paresis, tanda rangsang meningeal dan penyebab sistemik. EEG merupakan pemeriksaan penunjang terpilih, bukan manuver pemeriksaan fisik.';
+ } else if(title.includes('tension-type')||title.includes('migren')||title.includes('cluster headache')){
+  heading='Nyeri kepala primer — pemeriksaan neurologis dan tanda bahaya';
+  imgs=[];
+  focus='Pada nyeri kepala primer, pemeriksaan neurologis sering normal. Tetap nilai kesadaran, pupil, gerak bola mata, funduskopi bila mampu, kaku kuduk, defisit fokal, tekanan darah dan tanda otonom/okular sesuai jenis nyeri kepala.';
+ } else if(title.includes('spondilitis')||title.includes('spinal cord')||title.includes('neurogenic bladder')){
+  heading='Kelainan medula spinalis — level sensorik dan fungsi motorik';
+  imgs=[];
+  focus='Petakan level sensorik, kekuatan miotom, tonus, refleks tendon dalam, refleks patologis, gait dan fungsi sfingter. Nyeri punggung dengan defisit progresif, saddle anesthesia atau retensi urin merupakan tanda bahaya kompresi medula/kauda equina.';
+ } else if(title.includes('peroneal palsy')){
+  heading='Peroneal palsy — pemeriksaan foot drop';
+  imgs=[];
+  focus='Nilai dorsifleksi pergelangan dan ekstensi jari (melemah), eversi, pola sensorik dorsum kaki, gait steppage dan refleks. Bandingkan dengan radikulopati L5 serta lesi nervus ischiadicus.';
+ } else if(title.includes('neuralgia trigeminal')){
+  heading='Neuralgia trigeminal — pemetaan cabang nervus V';
+  imgs=[make('https://uploads-ssl.webflow.com/6011a994ad210082aa98b668/606d945845c22520c140cc76_sensory-branch-test-on-the-forehead.jpeg','Pemeriksaan sensibilitas cabang nervus trigeminus; petakan V1, V2, dan V3.','https://www.ncbi.nlm.nih.gov/books/NBK519517/')];
+  focus='Petakan area nyeri sesuai V1/V2/V3, cari trigger ringan, nilai sensasi wajah dan refleks kornea bila terlatih. Defisit sensorik objektif atau nyeri bilateral mengharuskan evaluasi penyebab sekunder.';
+ } else if(title.includes('vertigo')||title.includes('ménière')){
+  heading='Sindrom vestibular — pemeriksaan vestibular';
+  imgs=[make('https://cdn.lecturio.com/assets/Testing-cochlear-function-CN-VIII-1536x842.jpg','Pemeriksaan fungsi vestibulokoklear; lengkapi dengan nistagmus, head impulse, gait dan pendengaran.','https://www.lecturio.com/')];
+  focus='Karakterisasi nistagmus, head impulse, skew deviation, gait dan pendengaran. Untuk BPPV gunakan Dix–Hallpike; pada Ménière cari gangguan pendengaran sensorineural fluktuatif, tinnitus dan rasa penuh telinga.';
+ } else if(title.includes('neuropati perifer')||title.includes('nyeri neuropatik')||title.includes('hiv/aids')){
+  heading='Neuropati perifer — pemetaan sensorik dan refleks';
+  imgs=[];
+  focus='Nilai pola stocking-glove, sensasi raba/nyeri/vibrasi, propriosepsi, kekuatan distal, refleks Achilles dan gait. Tentukan apakah pola simetris distal, mononeuropati, atau poliradikuloneuropati.';
+ } else {
+  heading='Pemeriksaan neurologis terarah untuk '+l.title.replace(/^(4A|3A|3B) · /,'');
+  imgs=[];
+  focus='Pilih pemeriksaan berdasarkan struktur saraf yang mungkin terkena: kesadaran, saraf kranialis, motorik, refleks, sensorik, koordinasi, gait, dan tanda khusus sesuai keluhan. Tidak ditampilkan gambar umum yang tidak sesuai diagnosis.';
+ }
+ const search='https://www.google.com/search?tbm=isch&q='+encodeURIComponent(title+' specific clinical examination test medical');
+ return '<section class="study-ecg"><h3>'+heading+'</h3>'+(imgs.length?'<div class="study-visual-grid">'+imgs.map(x=>'<figure class="study-visual"><img loading="lazy" src="'+x.url+'" alt="'+x.caption+'" style="width:100%;height:auto;max-height:340px;object-fit:contain;border-radius:10px"><figcaption>'+x.caption+'<br><small><a href="'+x.source+'" target="_blank" rel="noopener">Sumber gambar / referensi</a></small></figcaption></figure>').join('')+'</div>':'<p class="muted">Belum ada foto klinis spesifik yang terverifikasi untuk diagnosis ini; tidak diganti dengan gambar pemeriksaan penyakit lain.</p>')+'<p>'+focus+'</p><p><a href="'+search+'" target="_blank" rel="noopener">Cari gambar pemeriksaan khusus diagnosis ini di Google Images ↗</a></p></section>';
 }
 function openNeuroLesson(i){
 const l=neuroLessons[i];if(!l)return;
