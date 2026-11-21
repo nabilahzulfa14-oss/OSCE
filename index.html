@@ -164,17 +164,38 @@ const physicalByCase={
  pneumonia:{ku:'Tampak sakit sedang, sesak ringan.',kesadaran:'Compos mentis.',ttv:'TD 110/70 mmHg; nadi 108 x/menit; RR 26 x/menit; suhu 38,5°C; SpO₂ 93%.',head:'Kepala normosefal.',eyes:'Konjungtiva tidak pucat.',ent:'Evaluasi faring dan mukosa.',neck:'Evaluasi penggunaan otot bantu dan limfadenopati.',thorax:'Takipnea ringan; fremitus meningkat dan perkusi redup basal kanan.',cardio:'Nilai frekuensi dan irama jantung.',resp:'Krepitasi basal kanan.',abd:'Tidak ada temuan khusus.',ext:'Nilai sianosis dan perfusi.',neuro:'Compos mentis.',skin:'Kulit hangat; tidak tampak sianosis sentral, tanpa ruam.'},
  anemia:{ku:'Tampak lemah.',kesadaran:'Compos mentis.',ttv:'TD 110/70 mmHg; nadi 96 x/menit; RR 20 x/menit; suhu 36,7°C; SpO₂ 99%.',head:'Kepala normosefal.',eyes:'Konjungtiva pucat.',ent:'Mukosa mulut dapat tampak pucat.',neck:'Tidak ada temuan khusus.',thorax:'Bunyi jantung reguler, tidak terdengar murmur; tidak ada tanda gagal jantung.',cardio:'Takikardia ringan; dapat terdengar bising aliran sistolik fungsional.',resp:'Auskultasi paru.',abd:'Tidak teraba hepatosplenomegali.',ext:'Kuku rapuh; nilai koilonychia.',neuro:'Compos mentis.',skin:'Kulit dan dasar kuku tampak pucat; kuku agak rapuh.'}
 };
-const physicalSections=[['ku','Keadaan umum (KU)'],['kesadaran','Kesadaran'],['ttv','Tanda-tanda vital (TTV)'],['head','Kepala'],['eyes','Mata'],['ent','Telinga, hidung, tenggorok, mulut'],['neck','Leher'],['thorax','Thoraks / inspeksi'],['cardio','Kardiovaskular'],['resp','Respirasi'],['abd','Abdomen'],['ext','Ekstremitas'],['neuro','Neurologis'],['skin','Kulit']];
+const physicalSections=[['ku','Keadaan umum'],['kesadaran','Kesadaran'],['ttv','Tanda-tanda vital'],['head','Kepala/wajah'],['eyes','Mata'],['ent','THT dan rongga mulut'],['neck','Leher'],['thorax','Dinding dada'],['cardio','Jantung dan sirkulasi'],['resp','Paru'],['abd','Abdomen'],['ext','Ekstremitas'],['neuro','Neurologis'],['skin','Kulit']];
+// Pemeriksaan fisik ditampilkan secara terarah per kasus, bukan head-to-toe otomatis.
+const physicalKeysByCase={
+ stemi:['ku','kesadaran','ttv','neck','thorax','cardio','resp','ext','skin'],
+ asma:['ku','kesadaran','ttv','ent','thorax','resp','skin'],
+ stroke:['ku','kesadaran','ttv','head','eyes','ent','neck','thorax','cardio','ext','neuro'],
+ appendicitis:['ku','kesadaran','ttv','ent','abd','ext'],
+ dm:['ku','ttv','eyes','neck','abd','ext','neuro','skin'],
+ dengue:['ku','kesadaran','ttv','eyes','ent','cardio','resp','abd','ext','skin'],
+ impetigo:['ku','ttv','head','neck','skin'],
+ uti:['ku','kesadaran','ttv','abd'],
+ febrile:['ku','kesadaran','ttv','head','eyes','ent','neck','resp','neuro','skin'],
+ pneumonia:['ku','kesadaran','ttv','neck','thorax','cardio','resp','ext','skin'],
+ anemia:['ku','kesadaran','ttv','eyes','cardio','resp','abd','ext','skin']
+};
+function isRelevantFinding(value){
+ const v=String(value||'').trim().toLowerCase();
+ if(!v)return false;
+ return !['tidak ada temuan khusus.','tidak ada temuan khusus','belum ada temuan spesifik.','belum ada temuan spesifik','tidak ada keluhan respirasi.','tidak ada keluhan respirasi','auskultasi paru.','auskultasi paru','pemeriksaan jantung-paru tanpa temuan khusus yang tercatat.'].includes(v);
+}
 function renderPhysical(){
  const p=physicalByCase[current.id]||{};
- $('physicalChecks').innerHTML=physicalSections.map(([k,label])=>'<label><input type="checkbox" value="'+k+'"> '+label+'</label>').join('');
+ const allowed=(physicalKeysByCase[current.id]||['ku','kesadaran','ttv']).filter(k=>isRelevantFinding(p[k]));
+ $('physicalChecks').innerHTML=allowed.map(k=>{const label=(physicalSections.find(x=>x[0]===k)||[k,k])[1];return '<label><input type="checkbox" value="'+k+'"> '+label+'</label>';}).join('');
  $('physicalResult').innerHTML='';
 }
 $('showPhysical').onclick=()=>{
  const p=physicalByCase[current.id]||{};
  const chosen=[...document.querySelectorAll('#physicalChecks input:checked')].map(x=>x.value);
- const keys=chosen.length?chosen:physicalSections.map(x=>x[0]);
- $('physicalResult').innerHTML='<div class="exam-card"><b>Temuan pemeriksaan fisik</b><div class="table-wrap"><table><tbody>'+keys.map(k=>{const label=(physicalSections.find(x=>x[0]===k)||[k,k])[1];return '<tr><th>'+label+'</th><td>'+(p[k]||'Dalam batas normal pada simulasi ini.')+'</td></tr>'}).join('')+'</tbody></table></div><small class="muted">Temuan yang tidak dicantumkan tidak boleh diasumsikan normal. Lengkapi pemeriksaan sesuai kondisi pasien.</small></div>';
+ const keys=(chosen.length?chosen:(physicalKeysByCase[current.id]||['ku','kesadaran','ttv'])).filter(k=>isRelevantFinding(p[k]));
+ if(!keys.length){$('physicalResult').innerHTML='<small class="muted">Belum ada temuan pemeriksaan spesifik yang tersedia untuk ditampilkan pada simulasi ini.</small>';return;}
+ $('physicalResult').innerHTML='<div class="exam-card"><b>Temuan pemeriksaan fisik yang relevan</b><div class="table-wrap"><table><tbody>'+keys.map(k=>{const label=(physicalSections.find(x=>x[0]===k)||[k,k])[1];return '<tr><th>'+label+'</th><td>'+p[k]+'</td></tr>'}).join('')+'</tbody></table></div><small class="muted">Hanya temuan yang relevan dengan kasus ini yang ditampilkan. Temuan yang tidak dicantumkan tidak boleh dianggap normal.</small></div>';
 };
 function normRange(label){
  const l=label.toLowerCase();
@@ -844,21 +865,9 @@ function respiratoryKeyHtml(l){
 
 
 function expandExistingSection(title,system,heading,original){
- const t=title.toLowerCase();let extra='';
- // Cardio/respiratory/GI: tampilkan temuan klinis, bukan instruksi langkah pemeriksaan.
- if(system==='Respirasi' && heading==='Pemeriksaan fisik'){
-  extra='TEMUAN YANG DAPAT DIJUMPAI: Pada obstruksi (asma/PPOK), ekspirasi memanjang, penggunaan otot bantu, hipersonor pada hiperinflasi, dan wheezing difus; pada serangan sangat berat suara napas dapat sangat lemah (silent chest). Pada pneumonia/konsolidasi, ekspansi lokal dapat menurun, fremitus meningkat, perkusi redup, suara napas bronkial, crackles fokal, atau egofoni. Pada efusi pleura, ekspansi, fremitus, dan suara napas menurun disertai perkusi redup/pekak. Pada pneumotoraks, suara napas dan fremitus menurun dengan perkusi hipersonor; pergeseran trakea dan hipotensi dapat muncul pada tension pneumothorax. Edema paru dapat menunjukkan crackles bilateral basal, takipnea, ortopnea, dan tanda kongesti. Pada infeksi jalan napas atas dapat ditemukan faring/tonsil hiperemis, eksudat, pembesaran tonsil, suara serak, stridor, drooling, atau pembengkakan unilateral sesuai penyakit.';
- }
- if(system==='Gastrointestinal' && (heading==='Pemeriksaan fisik'||heading==='Tanda dan gejala klinis')){
-  extra='TEMUAN PEMERIKSAAN: Keadaan umum dapat menunjukkan dehidrasi, pucat, ikterus, malnutrisi, atau tanda sepsis. Abdomen dapat tampak distensi, asimetris, terdapat bekas operasi, hernia, vena kolateral, atau peristaltik yang terlihat. Bising usus dapat meningkat/bernada tinggi pada obstruksi atau menurun pada ileus (tidak spesifik). Perkusi dapat dominan timpani, pekak pada organ/massa/cairan, dan shifting dullness dapat positif pada asites. Palpasi dapat menemukan nyeri tekan, defans involunter, rigiditas, massa, hepatomegali, atau splenomegali. Pada apendisitis dapat ditemukan nyeri titik McBurney serta Rovsing, psoas, atau obturator positif; hasil negatif tidak menyingkirkan diagnosis. Murphy positif mendukung kolesistitis; ikterus bersama demam dan nyeri kuadran kanan atas mengarah ke kolangitis. Nyeri epigastrium dapat ditemukan pada gastritis/ulkus atau pankreatitis; nyeri pankreatitis sering menjalar ke punggung. Pada kelainan anorektal dapat tampak fisura, hemoroid, fistula, kemerahan, atau fluktuasi perianal.';
- }
- if(system==='Neurologi' && /pemeriksaan fisik neurologis|pemeriksaan neurologis/.test(heading.toLowerCase())){
-  extra='POIN PEMERIKSAAN NEUROLOGIS: • Kesadaran dan fungsi luhur: GCS, orientasi, perhatian, bahasa, memori. • Saraf kranialis: pupil/refleks cahaya, gerak bola mata, lapang pandang, simetri wajah, pendengaran, refleks menelan, elevasi palatum, kekuatan bahu, dan deviasi lidah. • Motorik: inspeksi atrofi/fasikulasi, tonus, kekuatan tiap kelompok otot, pronator drift. • Refleks: tendon dalam kanan-kiri, refleks patologis Babinski, klonus bila diindikasikan. • Sensorik: raba, nyeri, suhu, vibrasi, propriosepsi dan pola dermatom/perifer. • Koordinasi dan gait: finger-to-nose, heel-to-shin, rapid alternating movement, Romberg dan pola berjalan. • Rangsang meningeal bila dicurigai: kaku kuduk, Kernig dan Brudzinski; hasil negatif tidak sepenuhnya menyingkirkan meningitis.';
- }
- if(system==='Neurologi' && /meningitis|ensefalitis|perdarahan subaraknoid/.test(t)){
-  extra+=' Temuan rangsang meningeal dapat berupa kaku kuduk, Kernig atau Brudzinski positif; dapat disertai fotofobia dan penurunan kesadaran. Defisit fokal, kejang baru, papiledema, atau penurunan kesadaran merupakan tanda bahaya.';
- }
- return [original,extra].filter(Boolean).join(' ');
+ // Materi tiap diagnosis harus berdiri pada temuan spesifik yang sudah ditulis untuk diagnosis itu.
+ // Tidak menambahkan daftar pemeriksaan lintas-penyakit atau temuan yang tidak relevan.
+ return original;
 }
 function likelyMeningeal(t){return /meningitis|ensefalitis|perdarahan subaraknoid/.test(t);}
 
