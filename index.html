@@ -48,7 +48,7 @@ button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;pad
  <div class="mode-choices" id="modeChooser"><button class="mode-card" id="chooseStudy"><b>📚 MODE BELAJAR</b><small>Ringkasan penyakit berdasarkan sistem dan tingkat kompetensi SKDI 2012.</small></button><button class="mode-card" id="choosePractice"><b>🩺 MODE LATIHAN</b><small>Simulasi pasien OSCE seperti sebelumnya.</small></button></div>
 <div class="dashselect hidden" id="studyPanel"><div class="topline"><div><h2>Mode belajar · SKDI 2012</h2><div class="muted">Pilih sistem, tingkat kompetensi, lalu penyakit.</div></div><button class="secondary" id="backModes">← Kembali</button></div><div class="filters"><select id="studySpec"><option value="all">Semua sistem</option></select><select id="studyLevel"><option value="all">Semua tingkat</option><option>4A</option><option>3A</option><option>3B</option></select><input id="studySearch" placeholder="Cari penyakit..."></div><div class="study-layout"><div class="panel"><b>Daftar penyakit</b><div id="studyCount" class="muted"></div><div id="studyList" class="study-list"></div></div><div class="panel" id="studyDetail"><h2>Pilih penyakit</h2></div></div></div>
 <div class="dashselect hidden" id="practicePanel">
-  <h2>Pilih stase latihan</h2><div class="muted">Pilih stase dan level. Sistem akan mengacak satu kasus yang tersedia.</div>
+  <div class="topline"><div><h2>Pilih stase latihan</h2> </div><button class="secondary" id="backModesPractice">← Pilih mode</button></div><div class="muted">Pilih stase dan level. Sistem akan mengacak satu kasus yang tersedia.</div>
   <div class="startrow">
    <div class="field"><label>Stase</label><select id="dashSpec"><option value="all">Semua stase</option><option value="Interna">Penyakit Dalam</option><option value="Cardio">Kardiovaskular</option><option value="Respirasi">Respirasi</option><option value="Bedah">Bedah</option><option value="Anak">Ilmu Kesehatan Anak</option><option value="Neuro">Neurologi</option><option value="Kulit">Kulit dan Kelamin</option><option value="Urologi">Urologi</option></select></div>
    <div class="field"><label>Level kompetensi</label><select id="dashLevel"><option value="all">Semua level</option><option>4A</option><option>3A</option><option>3B</option></select></div>
@@ -598,6 +598,7 @@ const diseaseBank = [
 function setMode(m){$('modeChooser').classList.add('hidden');$('studyPanel').classList.toggle('hidden',m!=='study');$('practicePanel').classList.toggle('hidden',m!=='practice')}
 $('chooseStudy').onclick=()=>{setMode('study');renderStudyList()};
 $('choosePractice').onclick=()=>setMode('practice');
+$('backModesPractice').onclick=()=>{$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden')};
 $('backModes').onclick=()=>{$('studyPanel').classList.add('hidden');$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden')};
 function renderStudyList(){
  const sp=$('studySpec').value,lv=$('studyLevel').value,q=$('studySearch').value.toLowerCase();
