@@ -11,7 +11,7 @@ header{background:linear-gradient(120deg,#14243b,#244d70);color:white;padding:22
 .wrap{max-width:1200px;margin:22px auto;padding:0 16px}.layout{display:grid;grid-template-columns:290px 1fr;gap:18px}.panel,.card{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 18px #1a35500a}.panel{padding:16px}.card{padding:20px;margin-bottom:16px}
 h2,h3,p{margin-top:0}h2{font-size:19px;margin-bottom:12px}h3{font-size:15px;margin-bottom:8px}
 .muted{color:var(--muted);font-size:13px}.filters{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
-button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:white;font-weight:650;cursor:pointer}button:hover{filter:brightness(.95)}button.secondary{background:#eaf0f6;color:var(--navy)}button.teal{background:var(--teal)}button:disabled{opacity:.45;cursor:not-allowed}
+button,select,input,textarea{font:inherit}\nbutton{pointer-events:auto;touch-action:manipulation;position:relative;z-index:1}button{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:white;font-weight:650;cursor:pointer}button:hover{filter:brightness(.95)}button.secondary{background:#eaf0f6;color:var(--navy)}button.teal{background:var(--teal)}button:disabled{opacity:.45;cursor:not-allowed}
 .case{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);padding:12px;margin:8px 0;border-radius:12px}.case.active{border:2px solid var(--teal);background:#f0faf8}.tag{display:inline-block;border-radius:20px;background:#eaf1f8;color:#315f91;font-size:11px;padding:3px 8px;margin-right:5px;font-weight:700}.tag.green{background:#e4f5f1;color:#14786e}
 .topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.timer{font-size:20px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin:10px 0}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:5px}input,select,textarea{width:100%;border:1px solid #d7e0e9;border-radius:9px;padding:10px;background:#fff;color:var(--ink)}textarea{min-height:82px;resize:vertical}
@@ -105,6 +105,26 @@ const cases=[
 ];
 let current=cases[0],seconds=720,clock,paused=true;
 const $=id=>document.getElementById(id);
+ // Fallback event delegation: controls remain clickable even if an individual inline handler fails.
+ document.addEventListener('click',function(ev){
+  const btn=ev.target.closest('button'); if(!btn)return;
+  try{
+   if(btn.id==='chooseStudy'){ev.preventDefault();setMode('study');renderStudyList();return;}
+   if(btn.id==='choosePractice'){ev.preventDefault();setMode('practice');return;}
+   if(btn.id==='backModes'){ev.preventDefault();$('studyPanel').classList.add('hidden');$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden');return;}
+   if(btn.id==='backModesPractice'){ev.preventDefault();$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden');return;}
+   if(btn.classList.contains('study-item') && btn.dataset.lesson!==undefined){
+    ev.preventDefault();ev.stopImmediatePropagation();const i=Number(btn.dataset.lesson),spec=$('studySpec').value;
+    if(spec==='Kardiovaskular')openCardioLesson(i);
+    else if(spec==='Respirasi')openRespiratoryLesson(i);
+    else if(spec==='Gastrointestinal')openGastroLesson(i);
+    else if(spec==='Neurologi')openNeuroLesson(i);
+    return;
+   }
+  }catch(err){console.error('MEDOSCE click error:',err);alert('Tombol terdeteksi, tetapi ada kesalahan saat membuka fitur: '+(err&&err.message?err.message:'silakan muat ulang halaman'));}
+ },true);
+ window.addEventListener('error',function(ev){console.error('MEDOSCE runtime error:',ev.message,ev.filename,ev.lineno);});
+
 function renderList(){let level=$('levelFilter').value,spec=$('specFilter').value;$('caseList').innerHTML='';cases.filter(c=>(level==='all'||c.level===level)&&(spec==='all'||c.spec===spec)).forEach(c=>{let b=document.createElement('button');b.className='case'+(current.id===c.id?' active':'');b.innerHTML='<b>'+c.title+'</b><br><span class="tag">'+c.level+'</span><span class="muted">'+c.spec+'</span>';b.onclick=()=>{loadCase(c);paused=false;$('pauseTimer').textContent='Pause'};$('caseList').append(b)})}
 function loadCase(c){current=c;renderPhysical();$('examResult').innerHTML='';$('caseTitle').textContent='Stasiun OSCE • '+c.spec;$('caseIntro').textContent=c.intro;$('levelTag').textContent=c.level;$('brief').textContent='Instruksi: lakukan anamnesis terarah, pilih pemeriksaan yang diperlukan, interpretasikan sendiri hasilnya, lalu tentukan diagnosis dan tatalaksana.';$('brief').classList.remove('hidden');$('chat').innerHTML='<div class="bubble patient">Selamat pagi, Dok. Saya datang karena '+c.intro.toLowerCase()+'</div>';$('quick').innerHTML='';Object.keys(c.answers).forEach(k=>{let b=document.createElement('button');b.className='secondary';b.textContent=({keluhan:'Keluhan utama',onset:'Awitan',penyerta:'Gejala penyerta',riwayat:'Riwayat penyakit',obat:'Obat yang digunakan',alergi:'Alergi'}[k]);b.onclick=()=>ask(k);$('quick').append(b)});$('managementChecks').innerHTML='';c.mgmt.forEach((m,i)=>$('managementChecks').insertAdjacentHTML('beforeend','<label><input type="checkbox" value="'+i+'"> '+m+'</label>'));$('diagnosis').value='';$('reasoning').value='';$('examResult').innerHTML='';$('prescription').value='';$('education').value='';$('ddx').value='';$('evaluation').classList.add('hidden');seconds=720;paused=true;$('pauseTimer').textContent='Lanjutkan';showTime();renderList()}
 function ask(k){let q=({keluhan:'Apa keluhan utama?',onset:'Sejak kapan dan bagaimana awal keluhannya?',penyerta:'Apakah ada gejala lain yang menyertai?',riwayat:'Apakah ada riwayat penyakit sebelumnya?',obat:'Obat apa yang sedang digunakan?',alergi:'Apakah ada alergi obat atau makanan?'}[k]);$('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+current.answers[k]+'</div>');$('chat').scrollTop=$('chat').scrollHeight}
