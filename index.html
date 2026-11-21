@@ -2406,7 +2406,8 @@ const integumentSKDIOrder=[
   "Luka akibat bahan kimia",
   "Luka akibat sengatan listrik"
 ];
-integumentRows.sort((a,b)=>integumentSKDIOrder.indexOf(a.name)-integumentSKDIOrder.indexOf(b.name));
+const integumentLevelOrder={'4A':0,'3A':1,'3B':2};
+integumentRows.sort((a,b)=>integumentLevelOrder[a.level]-integumentLevelOrder[b.level] || integumentSKDIOrder.indexOf(a.name)-integumentSKDIOrder.indexOf(b.name));
 const integumentDefinition={
   "Veruka vulgaris": "Infeksi kulit oleh human papillomavirus (HPV), terutama tipe kutaneus. Virus masuk melalui mikroabrasi epidermis dan menyebabkan proliferasi keratinosit sehingga terbentuk kutil.",
   "Kondiloma akuminatum": "Infeksi menular seksual pada kulit atau mukosa anogenital akibat HPV, terutama tipe 6 dan 11. Penularan terutama melalui kontak seksual kulit-ke-kulit.",
