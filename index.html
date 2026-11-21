@@ -586,13 +586,16 @@ $('dashSpec').insertAdjacentHTML('beforeend',[...new Set(diseaseBank.map(d=>d.sp
 function updateAvailable(){
  const sp=$('dashSpec').value,lv=$('dashLevel').value;
  const a=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
- $('availableInfo').textContent=a.length+' penyakit tersedia dan dapat dibuka sebagai simulasi latihan. Sebelas stasiun awal memiliki skenario terkurasi; entri lain memakai template kasus latihan yang perlu diperkaya.';
+ const curatedNames=new Set(['Asma bronkial','Infark miokard','Kejang demam','Pneumonia, bronkopneumonia','Diabetes melitus tipe 2','Demam dengue, DHF','Impetigo','Infeksi saluran kemih','Anemia defisiensi besi']);
+ const playable=a.filter(d=>curatedNames.has(d.name));
+ $('availableInfo').textContent=a.length+' entri SKDI sesuai filter; '+playable.length+' memiliki skenario terkurasi yang saat ini dapat dimainkan. Entri lain sedang dalam penyusunan materi klinis dan tidak diacak.';
 }
 $('dashSpec').onchange=updateAvailable;$('dashLevel').onchange=updateAvailable;updateAvailable();
 $('backDashboard').onclick=()=>{$('stationArea').classList.remove('active');$('stationArea').classList.remove('blind-mode');$('dashboard').classList.remove('hidden');paused=true;$('pauseTimer').textContent='Lanjutkan';window.scrollTo({top:0,behavior:'smooth'})};
 $('startRandom').onclick=()=>{
  const sp=$('dashSpec').value,lv=$('dashLevel').value;
- const pool=diseaseBank.filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
+ const curatedNames=new Set(['Asma bronkial','Infark miokard','Kejang demam','Pneumonia, bronkopneumonia','Diabetes melitus tipe 2','Demam dengue, DHF','Impetigo','Infeksi saluran kemih','Anemia defisiensi besi']);
+ const pool=diseaseBank.filter(d=>curatedNames.has(d.name)&&(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv));
  if(!pool.length){alert('Tidak ada penyakit untuk filter ini.');return;}
  const chosen=pool[Math.floor(Math.random()*pool.length)];
  playDisease(diseaseBank.indexOf(chosen));
@@ -642,15 +645,20 @@ function makeCatalogCase(d){
 }
 function playDisease(index){
  const d=diseaseBank[index];if(!d)return;
- const c=makeCatalogCase(d);
+ const curatedMap={'Asma bronkial':'asma','Infark miokard':'stemi','Kejang demam':'febrile','Pneumonia, bronkopneumonia':'pneumonia','Diabetes melitus tipe 2':'dm2','Demam dengue, DHF':'dengue','Impetigo':'impetigo','Infeksi saluran kemih':'cystitis','Anemia defisiensi besi':'ida'};
+ const curatedId=curatedMap[d.name];
+ const c=curatedId?cases.find(x=>x.id===curatedId&&x.level===d.level):null;
+ if(!c){alert('Materi klinis dan skenario OSCE untuk penyakit ini belum selesai diverifikasi. Penyakit tetap tercantum sesuai SKDI 2012, tetapi simulasi belum dibuka agar tidak menampilkan temuan, hasil lab, atau resep generik yang berpotensi menyesatkan. Buka Mode Belajar untuk melihat status kelengkapannya.');return;}
  physicalByCase[c.id]={ku:'Tampak sakit ringan–sedang, kooperatif; sesuaikan penilaian dengan kondisi klinis.',kesadaran:'Compos mentis, GCS 15 (E4V5M6).',ttv:'TD 120/80 mmHg; nadi 88 x/menit; RR 18 x/menit; suhu 36,8°C; SpO₂ 98%. Data dasar simulasi; cari tanda vital abnormal melalui pemeriksaan terarah bila relevan.',head:'Kepala normosefal, tidak tampak trauma.',eyes:'Konjungtiva tidak pucat, sklera tidak ikterik; pupil isokor 3 mm, refleks cahaya +/+. ',ent:'Mukosa lembap; tidak ada sekret abnormal yang tampak pada pemeriksaan umum.',neck:'Tidak ada kaku kuduk; tidak teraba pembesaran kelenjar getah bening pada pemeriksaan umum.',thorax:'Gerak dada simetris, tidak ada retraksi.',cardio:'Bunyi jantung I–II reguler, tidak terdengar murmur pada pemeriksaan umum.',resp:'Suara napas vesikuler bilateral, tidak terdengar ronki atau mengi pada pemeriksaan umum.',abd:'Abdomen datar, bising usus normal, tidak ada nyeri tekan pada pemeriksaan umum.',ext:'Akral hangat, CRT <2 detik, tidak tampak edema.',neuro:'Kesadaran baik, orientasi baik, tidak tampak defisit motorik kasar pada skrining umum.',skin:'Tidak tampak ruam atau lesi spesifik pada pemeriksaan umum. Temuan khusus harus diminta sesuai fokus pemeriksaan.'};
  $('dashboard').classList.add('hidden');$('stationArea').classList.add('active','blind-mode');loadCase(c);paused=false;$('pauseTimer').textContent='Pause';window.scrollTo({top:0,behavior:'smooth'});
 }
 function renderCatalog(){
  const spec=$('catalogSpec').value,level=$('catalogLevel').value,q=$('catalogSearch').value.toLowerCase();
  const filtered=diseaseBank.map((d,i)=>({...d,index:i})).filter(d=>(spec==='all'||d.spec===spec)&&(level==='all'||d.level===level)&&d.name.toLowerCase().includes(q));
- $('catalogCount').textContent=filtered.length+' penyakit • bisa dimainkan';
- $('catalogList').innerHTML=filtered.map(d=>'<button class="catalog-item" onclick="playDisease('+d.index+')" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · Klik untuk mulai simulasi</small></span><span class="tag '+(d.level==='4A'?'green':'')+'">'+d.level+'</span></button>').join('');
+ const curatedNames=new Set(['Asma bronkial','Infark miokard','Kejang demam','Pneumonia, bronkopneumonia','Diabetes melitus tipe 2','Demam dengue, DHF','Impetigo','Infeksi saluran kemih','Anemia defisiensi besi']);
+ const playable=filtered.filter(d=>curatedNames.has(d.name)).length;
+ $('catalogCount').textContent=filtered.length+' penyakit SKDI • '+playable+' skenario terkurasi siap dimainkan';
+ $('catalogList').innerHTML=filtered.map(d=>{const ready=curatedNames.has(d.name);return '<button class="catalog-item" onclick="'+(ready?'playDisease('+d.index+')':'openStudy('+d.index+')')+'" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · '+(ready?'Skenario terkurasi — mulai latihan':'Materi klinis belum lengkap — lihat status')+'</small></span><span class="tag '+(ready?'green':'')+'">'+d.level+'</span></button>'}).join('');
 }
 [...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>{$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>');$('studySpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>')});$('studySpec').onchange=renderStudyList;$('studyLevel').onchange=renderStudyList;$('studySearch').oninput=renderStudyList;
 $('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
