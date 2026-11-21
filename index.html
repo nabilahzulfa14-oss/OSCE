@@ -779,11 +779,12 @@ function openCardioLesson(i){
  const l=cardioLessons[i];if(!l)return;
  document.querySelectorAll('#studyList .study-item').forEach((b)=>b.classList.toggle('active',Number(b.dataset.lesson)===i));
  const ecgImages=[
-  {match:'Infark miokard',title:'Contoh EKG infark miokard dengan elevasi ST',file:'12 Lead EKG ST Elevation tracing only.jpg',source:'https://commons.wikimedia.org/wiki/Category:ECG_of_myocardial_infarction'},
+  {match:'Infark miokard',title:'Contoh EKG STEMI dengan elevasi ST',file:'ST elevation myocardial infarction ECG.jpg',source:'https://commons.wikimedia.org/wiki/File:ST_elevation_myocardial_infarction_ECG.jpg'},
   {match:'Fibrilasi atrium',title:'Contoh EKG fibrilasi atrium',file:'ECG_Atrial_Fibrillation.svg',source:'https://commons.wikimedia.org/wiki/File:ECG_Atrial_Fibrillation.svg'},
-  {match:'Flutter atrium',title:'Contoh EKG flutter atrium',file:'ECG-atrial_flutter.jpg',source:'https://commons.wikimedia.org/wiki/Category:ECG'},
-  {match:'Takikardia supraventrikular dan ventrikular',title:'Contoh EKG takikardia ventrikel',file:'Electrocardiogram_of_Ventricular_Tachycardia.png',source:'https://commons.wikimedia.org/wiki/File:Electrocardiogram_of_Ventricular_Tachycardia.png'},
-  {match:'Fibrilasi ventrikel',title:'Contoh EKG fibrilasi ventrikel',file:'Ventricular_fibrillation_(from_ecg-quiz.com).jpg',source:'https://commons.wikimedia.org/wiki/File:Ventricular_fibrillation_(from_ecg-quiz.com).jpg'}
+  {match:'Atrial flutter',title:'Contoh EKG atrial flutter 12 sadapan',file:'AtrialFlutter12.JPG',source:'https://commons.wikimedia.org/wiki/File:AtrialFlutter12.JPG'},
+  {match:'Takikardia supraventrikular dan ventrikular',title:'Contoh EKG takikardia ventrikel 12 sadapan',file:'Electrocardiogram_of_Ventricular_Tachycardia.png',source:'https://commons.wikimedia.org/wiki/File:Electrocardiogram_of_Ventricular_Tachycardia.png'},
+  {match:'Fibrilasi ventrikel',title:'Contoh EKG fibrilasi ventrikel',file:'Ventricular_Fibrillation.svg',source:'https://commons.wikimedia.org/wiki/File:Ventricular_Fibrillation.svg'},
+  {match:'Ekstrasistol',title:'Contoh EKG ekstrasistol atrium dan ventrikel (PAC dan PVC)',file:'NSR_and_Ectopic_beats_(PVC_and_PAC).svg',source:'https://commons.wikimedia.org/wiki/File:NSR_and_Ectopic_beats_(PVC_and_PAC).svg'}
  ];
  const ecg=ecgImages.find(x=>l.title.toLowerCase().includes(x.match.toLowerCase()));
  const imageBlock=ecg?'<section class="study-ecg"><h3>Gambaran EKG</h3><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(ecg.file)+'" alt="'+ecg.title+'" /><p class="muted">'+ecg.title+'. Gunakan gambar untuk latihan mengenali pola; interpretasi tetap harus dikaitkan dengan kondisi klinis dan EKG 12 sadapan pasien.</p><a href="'+ecg.source+'" target="_blank" rel="noopener">Sumber gambar Wikimedia Commons</a></section>':'';
