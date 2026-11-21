@@ -31,7 +31,7 @@ button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;pad
 .exam-image{width:100%;max-height:280px;object-fit:contain;background:#101827;border-radius:12px;padding:8px;display:block;margin:8px 0}
 .exam-card{border:1px solid var(--line);padding:12px;border-radius:12px;margin:10px 0;background:#fff}
 .exam-card textarea{min-height:65px}
-@media(max-width:800px){.dashgrid{grid-template-columns:repeat(2,1fr)}.startrow{grid-template-columns:1fr}.dashhero{align-items:flex-start;flex-direction:column}}.timer-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.catalog-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:560px;overflow:auto}.catalog-item{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);padding:9px 10px;border-radius:9px;font-size:13px;background:#fff}.catalog-item b{font-weight:600}.catalog-item .tag{flex-shrink:0}.catalog-item small{color:var(--muted)}@media(max-width:800px){.catalog-list{grid-template-columns:1fr}}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:800px){.dashgrid{grid-template-columns:repeat(2,1fr)}.startrow{grid-template-columns:1fr}.dashhero{align-items:flex-start;flex-direction:column}} .mode-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.mode-card{background:white;color:var(--ink);border:1px solid var(--line);padding:20px;text-align:left;min-height:110px}.mode-card b{display:block;font-size:18px}.mode-card small{display:block;color:var(--muted);font-weight:400}.study-layout{display:grid;grid-template-columns:260px 1fr;gap:12px;margin-top:12px}.study-list{max-height:520px;overflow:auto}.study-item{display:block;width:100%;background:white;color:var(--ink);border:1px solid var(--line);text-align:left;margin:5px 0}.study-note{background:#fff8e8;padding:12px;border-radius:10px;margin:12px 0}@media(max-width:800px){.mode-choices,.study-layout{grid-template-columns:1fr}}.timer-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.catalog-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:560px;overflow:auto}.catalog-item{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);padding:9px 10px;border-radius:9px;font-size:13px;background:#fff}.catalog-item b{font-weight:600}.catalog-item .tag{flex-shrink:0}.catalog-item small{color:var(--muted)}@media(max-width:800px){.catalog-list{grid-template-columns:1fr}}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.checks{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}}
 </style></head>
 <body>
@@ -45,7 +45,9 @@ button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;pad
   <div class="dashstat"><b>Random</b><span>Kasus tanpa bocoran diagnosis</span></div>
   <div class="dashstat"><b>Interpretasi mandiri</b><span>Hasil penunjang tidak dibocorkan</span></div>
  </div>
- <div class="dashselect">
+ <div class="mode-choices" id="modeChooser"><button class="mode-card" id="chooseStudy"><b>📚 MODE BELAJAR</b><small>Ringkasan penyakit berdasarkan sistem dan tingkat kompetensi SKDI 2012.</small></button><button class="mode-card" id="choosePractice"><b>🩺 MODE LATIHAN</b><small>Simulasi pasien OSCE seperti sebelumnya.</small></button></div>
+<div class="dashselect hidden" id="studyPanel"><div class="topline"><div><h2>Mode belajar · SKDI 2012</h2><div class="muted">Pilih sistem, tingkat kompetensi, lalu penyakit.</div></div><button class="secondary" id="backModes">← Kembali</button></div><div class="filters"><select id="studySpec"><option value="all">Semua sistem</option></select><select id="studyLevel"><option value="all">Semua tingkat</option><option>4A</option><option>3A</option><option>3B</option></select><input id="studySearch" placeholder="Cari penyakit..."></div><div class="study-layout"><div class="panel"><b>Daftar penyakit</b><div id="studyCount" class="muted"></div><div id="studyList" class="study-list"></div></div><div class="panel" id="studyDetail"><h2>Pilih penyakit</h2></div></div></div>
+<div class="dashselect hidden" id="practicePanel">
   <h2>Pilih stase latihan</h2><div class="muted">Pilih stase dan level. Sistem akan mengacak satu kasus yang tersedia.</div>
   <div class="startrow">
    <div class="field"><label>Stase</label><select id="dashSpec"><option value="all">Semua stase</option><option value="Interna">Penyakit Dalam</option><option value="Cardio">Kardiovaskular</option><option value="Respirasi">Respirasi</option><option value="Bedah">Bedah</option><option value="Anak">Ilmu Kesehatan Anak</option><option value="Neuro">Neurologi</option><option value="Kulit">Kulit dan Kelamin</option><option value="Urologi">Urologi</option></select></div>
@@ -591,6 +593,28 @@ const diseaseBank = [
 ["Forensik","Kematian mendadak","3B"],
 ["Forensik","Toksikologi forensik","3A"]
 ].map(([spec,name,level])=>({spec,name,level}));
+
+
+function setMode(m){$('modeChooser').classList.add('hidden');$('studyPanel').classList.toggle('hidden',m!=='study');$('practicePanel').classList.toggle('hidden',m!=='practice')}
+$('chooseStudy').onclick=()=>{setMode('study');renderStudyList()};
+$('choosePractice').onclick=()=>setMode('practice');
+$('backModes').onclick=()=>{$('studyPanel').classList.add('hidden');$('practicePanel').classList.add('hidden');$('modeChooser').classList.remove('hidden')};
+function renderStudyList(){
+ const sp=$('studySpec').value,lv=$('studyLevel').value,q=$('studySearch').value.toLowerCase();
+ const a=diseaseBank.map((d,i)=>({...d,i})).filter(d=>(sp==='all'||d.spec===sp)&&(lv==='all'||d.level===lv)&&d.name.toLowerCase().includes(q));
+ $('studyCount').textContent=a.length+' penyakit';
+ $('studyList').innerHTML=a.map(d=>'<button class="study-item" onclick="openStudy('+d.i+')">'+d.name+'<br><small>'+d.spec+' · SKDI '+d.level+'</small></button>').join('');
+ if(a.length)openStudy(a[0].i);else $('studyDetail').innerHTML='Tidak ada hasil.';
+}
+function openStudy(i){
+ const d=diseaseBank[i];if(!d)return;
+ const map={'Asma bronkial':'asma','Infark miokard':'stemi','Kejang demam':'febrile','Pneumonia, bronkopneumonia':'pneumonia','Diabetes melitus tipe 2':'dm2','Demam dengue, DHF':'dengue','Impetigo':'impetigo','Infeksi saluran kemih':'cystitis','Anemia defisiensi besi':'ida'};
+ const c=cases.find(x=>x.id===map[d.name]&&x.level===d.level);
+ let body='<div class="study-note"><b>SKDI 2012:</b> '+d.spec+' · tingkat '+d.level+'.';
+ if(c){body+=' Materi ringkas di bawah berasal dari skenario latihan terkurasi.</div><h3>Gambaran kasus</h3><p>'+c.intro+'</p><h3>Ringkasan anamnesis</h3><ul>'+Object.entries(c.answers).map(([k,v])=>'<li><b>'+k+':</b> '+v+'</li>').join('')+'</ul><h3>Pemeriksaan/temuan yang tersedia</h3><ul>'+Object.entries(c.findings||{}).map(([k,v])=>'<li><b>'+k+':</b> '+v+'</li>').join('')+'</ul><h3>Langkah tatalaksana dalam stasiun</h3><ul>'+c.mgmt.map(v=>'<li>'+v+'</li>').join('')+'</ul>';}
+ else {body+='</div><p><b>Materi klinis belum disusun dan diverifikasi.</b> Untuk mencegah informasi yang keliru, ringkasan klinis, temuan khas, pemeriksaan, dan resep belum ditampilkan untuk penyakit ini.</p><h3>Bagian materi yang akan dilengkapi</h3><ul><li>Definisi dan gambaran klinis</li><li>Anamnesis dan faktor risiko</li><li>Pemeriksaan fisik dan temuan khas</li><li>Pemeriksaan penunjang dan interpretasi</li><li>Diagnosis dan diagnosis banding</li><li>Tatalaksana, resep, edukasi, dan rujukan</li></ul>';}
+ $('studyDetail').innerHTML='<span class="tag">'+d.spec+'</span><span class="tag green">SKDI '+d.level+'</span><h2>'+d.name+'</h2>'+body+'<button class="teal" onclick="playDisease('+i+')">Latihan penyakit ini →</button>';
+}
 
 function makeCatalogCase(d){
  const id='skdi-'+d.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+d.level;
