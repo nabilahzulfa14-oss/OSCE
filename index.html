@@ -2275,7 +2275,9 @@ const osceRxExamples = [
 {sys:'Gastrointestinal',re:/gastroenteritis akut|diare akut non-disentri/i,html:'<p>Contoh terapi rehidrasi:</p><pre>R/ Oralit serbuk No. X sachet\nS. Larutkan sesuai volume air pada kemasan; minum sedikit-sedikit setiap BAB cair</pre><p>Antibiotik tidak rutin. Anak memerlukan penilaian usia/BB dan regimen tersendiri.</p>'},
 {sys:'Psikiatri',re:/skizofrenia/i,html:'<p>Antipsikotik tidak dibuat otomatis dari label diagnosis. Pemilihan dan dosis memerlukan asesmen episode, risiko keselamatan, komorbid, interaksi, efek samping dan pemantauan; kolaborasi/rujuk psikiatri sesuai kompetensi.</p>'},
 {sys:'Neurologi',re:/epilepsi/i,html:'<p>Obat antiepilepsi ditentukan oleh tipe bangkitan/sindrom, usia, potensi hamil, fungsi organ dan interaksi. Kejang berkepanjangan/status epileptikus adalah kegawatdaruratan yang memerlukan protokol emergensi dan rujukan.</p>'}
-];
+,
+{sys:'Muskuloskeletal',re:/osteoarthritis/i,html:'<p>Contoh OA lutut terlokalisasi pada dewasa, kulit utuh, tanpa alergi/kontraindikasi NSAID:</p><pre>R/ Diclofenac gel 1% tube 20 g No. I\nS. Oles tipis pada area nyeri 3–4 dd sehari</pre><p>Hindari pemakaian pada luka/infeksi kulit. Evaluasi risiko NSAID, luas area, durasi, kehamilan dan obat lain; terapi inti tetap latihan, penguatan otot dan penurunan berat badan bila perlu.</p>'},
+{sys:'Muskuloskeletal',re:/osteoporosis/i,html:'<p>Contoh pilihan antiresorptif pada osteoporosis terkonfirmasi dan pasien sesuai indikasi, setelah koreksi hipokalsemia/defisiensi vitamin D dan evaluasi fungsi ginjal:</p><pre>R/ Alendronate tab 70 mg No. IV\nS. 1 tab p.o. 1 kali seminggu</pre><p>Minum pagi saat perut kosong dengan segelas penuh air putih; tetap duduk/berdiri ≥30 menit dan jangan makan/minum/obat lain selama interval tersebut. Hindari bila kelainan esofagus tertentu, tidak mampu tegak, hipokalsemia, atau gangguan ginjal berat. Individualisasi menurut PNPK.</p>'}];
 function prescriptionStudyBlock(title,system){
  const clean=String(title||'').replace(/^(4A|3A|3B) · /,'');
  const match=osceRxExamples.find(x=>x.sys===system&&x.re.test(clean));
