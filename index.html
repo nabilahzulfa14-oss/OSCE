@@ -1748,8 +1748,15 @@ function buildReproLessons(){
 }
 const reproLessons=buildReproLessons();
 function reproVisualBlock(l){
- const q=encodeURIComponent(l.title.replace(/^(4A|3A|3B) · /,'')+' clinical findings ultrasound examination');
- return '<section class="study-ecg"><h3>Gambar klinis / pemeriksaan penunjang</h3><p>Gunakan gambar sesuai diagnosis untuk latihan mengenali temuan. Pilih sumber edukasi klinis dan cocokkan dengan temuan pemeriksaan pada materi ini.</p><a href="https://www.google.com/search?tbm=isch&q='+q+'" target="_blank" rel="noopener">Buka gambar klinis dan pemeriksaan terkait diagnosis ini ↗</a></section>';
+ const name=l.title.replace(/^(4A|3A|3B) · /,'');
+ const q=encodeURIComponent(name+' clinical photo ultrasound examination');
+ const visualMap=[
+  {test:/Abortus spontan inkomplit|Abortus spontan komplit|Abortus mengancam/,url:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ultrasound_Scan_ND_0118160219_1605490.png/500px-Ultrasound_Scan_ND_0118160219_1605490.png.png',caption:'USG transabdominal: contoh gambaran jaringan heterogen di segmen bawah uterus/kanalis serviks pada abortus inkomplit',source:'Wikimedia Commons · ultrasound image'},
+  {test:/Prolaps tali pusat/,url:'https://i0.wp.com/obgynkey.com/wp-content/uploads/2019/01/m_butler_c41_f09.png?fit=520%2C477&ssl=1',caption:'Diagram tata laksana prolaps tali pusat: posisi ibu, elevasi bagian terendah janin dan percepatan persalinan',source:'OBGYN Key · obstetric emergency'},
+ ];
+ const found=visualMap.find(v=>v.test.test(name));
+ const image=found?'<figure style="margin:10px 0"><a href="'+found.url+'" target="_blank" rel="noopener"><img src="'+found.url+'" alt="'+found.caption+'" loading="lazy" style="width:100%;max-height:360px;object-fit:contain;background:#fff;border:1px solid var(--line,#ddd);border-radius:12px"></a><figcaption class="muted" style="font-size:12px;margin-top:6px">'+found.caption+' · '+found.source+'</figcaption></figure>':'';
+ return '<section class="study-ecg"><h3>🖼️ GAMBAR KLINIS / PEMERIKSAAN</h3>'+image+'<p>Gambar yang sesuai diagnosis ini dapat dibuka melalui pencarian visual berikut. Perhatikan struktur dan temuan khasnya, lalu cocokkan dengan hasil pemeriksaan pada materi.</p><a href="https://www.google.com/search?tbm=isch&q='+q+'" target="_blank" rel="noopener">Lihat foto klinis, USG, atau CTG diagnosis ini ↗</a><br><a href="https://obgynspace.com/atlas" target="_blank" rel="noopener">Buka atlas visual obstetri-ginekologi (USG, CTG, foto pemeriksaan) ↗</a></section>';
 }
 function openReproLesson(i){
  const l=reproLessons[i];if(!l)return;
