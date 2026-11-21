@@ -904,11 +904,118 @@ function diagnosticResultPanel(title,system){
  return '';
 }
 
-function expandExistingSection(title,system,heading,original){
- // Materi tiap diagnosis harus berdiri pada temuan spesifik yang sudah ditulis untuk diagnosis itu.
- // Tidak menambahkan daftar pemeriksaan lintas-penyakit atau temuan yang tidak relevan.
- return original;
+function clinicalSignature(title,system){
+ const t=String(title||'').toLowerCase();
+ const rules={
+  Kardiovaskular:[
+   [/hipertensi esensial/,'Sering tanpa gejala; pada pemeriksaan cari tekanan darah meningkat yang terkonfirmasi berulang dan tanda kerusakan organ target (retinopati, bruit, pembesaran jantung, defisit neurologis), bukan menganggap sakit kepala sebagai tanda khas.'],
+   [/hipertensi sekunder/,'Petunjuk penyebab: bruit abdomen (stenosis arteri renalis), hipokalemia/kelemahan otot (hiperaldosteronisme), episode sakit kepala–berdebar–berkeringat (feokromositoma), habitus Cushing atau gejala tiroid, serta dengkuran/apnea tidur.'],
+   [/angina pektoris/,'Nyeri dada terasa tertekan/berat, dipicu aktivitas atau stres, berlangsung beberapa menit dan mereda dengan istirahat/nitrat; biasanya tidak ada nyeri tekan dinding dada yang mereproduksi keluhan.'],
+   [/infark miokard/,'Nyeri dada menetap >20 menit, tidak membaik dengan istirahat, dapat menjalar ke lengan/rahang/punggung; keringat dingin, mual, pucat, sesak atau sinkop. Pada lansia/diabetes dapat tanpa nyeri dada.'],
+   [/gagal jantung akut/,'Ortopnea/PND, sesak akut, ronki basah bilateral, hipoksemia dan dapat sputum berbusa merah muda; nilai JVP, perfusi perifer dan tanda edema paru.'],
+   [/gagal jantung kronik/,'JVP meningkat, edema pitting bilateral, hepatomegali, ronki basal, bunyi S3 dan ictus cordis bergeser; gejala memburuk saat aktivitas atau saat berbaring.'],
+   [/henti jantung/,'Tidak responsif, tidak bernapas normal (gasping bukan napas normal), dan nadi sentral tidak teraba dalam ≤10 detik; segera mulai RJP dan gunakan AED.'],
+   [/takikardia supraventrikular dan ventrikular/,'SVT reguler biasanya kompleks QRS sempit dengan onset/terminasi mendadak; VT umumnya kompleks lebar, dapat disertai disosiasi AV/capture atau fusion beats. Ketidakstabilan: hipotensi, nyeri iskemik, syok, edema paru atau penurunan kesadaran.'],
+   [/fibrilasi atrium/,'Nadi ireguler-ireguler tanpa pola, intensitas denyut bervariasi; pada EKG tidak ada gelombang P konsisten dan interval RR ireguler.'],
+   [/fibrilasi ventrikel/,'Kolaps mendadak, tidak sadar, tidak ada nadi dan napas normal; EKG berupa aktivitas listrik kacau tanpa kompleks QRS terorganisasi.'],
+   [/atrial flutter/,'Palpitasi dengan nadi sering reguler bila konduksi tetap (mis. 2:1); EKG menunjukkan gelombang flutter seperti gigi gergaji, terutama II, III, aVF.'],
+   [/ekstrasistol/,'Denyut prematur diselingi jeda; pasien sering merasa “jantung melompat”. PVC lebar dan prematur tanpa P sebelumnya; PAC datang lebih awal dengan morfologi P berbeda.'],
+   [/kor pulmonale akut/,'Sesak mendadak, nyeri pleuritik/hemoptisis dapat menyertai emboli paru; tanda beban jantung kanan berupa JVP meningkat, P2 keras, hipotensi atau tanda syok.'],
+   [/kor pulmonale kronik/,'Tanda hipertensi pulmonal dan gagal jantung kanan: JVP meningkat, edema tungkai, hepatomegali kongestif, parasternal heave dan P2 mengeras; sering disertai penyakit paru kronik.'],
+   [/tromboflebitis/,'Nyeri, kemerahan, hangat dan vena superfisial teraba seperti tali; bila DVT curiga bengkak unilateral, nyeri betis dan perbedaan lingkar tungkai.'],
+   [/limfangitis/,'Garis kemerahan hangat yang menjalar mengikuti alur limfatik dari luka/infeksi menuju kelenjar regional, disertai nyeri tekan dan kadang demam.'],
+   [/limfedema/,'Pembengkakan kronik, sering tidak nyeri; awalnya pitting lalu menjadi non-pitting dengan kulit menebal/bertekstur seperti kulit jeruk. Stemmer sign dapat positif.'],
+   [/insufisiensi vena kronik/,'Edema pergelangan memburuk saat berdiri, varises, hiperpigmentasi hemosiderin dan dermatitis stasis; ulkus khas di sekitar maleolus medialis.'],
+   [/syok/,'Hipoperfusi: perubahan kesadaran, akral dingin/lembap, CRT memanjang, nadi cepat-lemah dan oliguria. Syok septik awal dapat berakral hangat; syok neurogenik dapat hipotensi dengan bradikardia dan kulit hangat-kering.']
+  ],
+  Respirasi:[
+   [/influenza/,'Awitan mendadak demam, menggigil, mialgia/nyeri badan berat, sakit kepala, batuk kering dan lemas; berbeda dari common cold yang biasanya lebih dominan pilek/bersin.'],
+   [/pertusis/,'Batuk paroksismal beruntun, whoop saat inspirasi, muntah pascabatuk; bayi dapat hanya apnea/sianosis tanpa whoop.'],
+   [/faringitis/,'Nyeri tenggorok dan faring hiperemis; batuk-pilek-konjungtivitis lebih mendukung virus, sedangkan demam, eksudat tonsil, petekie palatum dan kelenjar servikal anterior nyeri mendukung GAS.'],
+   [/tonsilitis/,'Tonsil membesar dan hiperemis, dapat ber-eksudat; nilai asimetri, trismus, deviasi uvula dan suara “hot potato” untuk mencari abses peritonsilar.'],
+   [/laringitis/,'Disfonia/serak sebagai keluhan dominan, suara melemah atau hilang, batuk kering dan rasa mengganjal; stridor bukan gambaran laringitis sederhana dan merupakan tanda bahaya.'],
+   [/asma/,'Gejala episodik dan bervariasi: mengi ekspirasi, sesak, dada terasa berat dan batuk malam/dini hari; pencetus alergi, aktivitas atau udara dingin, dengan periode hampir normal di antara serangan. Silent chest pada serangan berat adalah tanda sangat gawat.'],
+   [/ppok|penyakit paru obstruktif kronik/,'Batuk berdahak kronik, sesak progresif terutama saat aktivitas, ekspirasi memanjang, pursed-lip breathing, barrel chest dan penggunaan otot bantu; clubbing tidak khas PPOK sederhana.'],
+   [/pneumonia/,'Demam, batuk produktif, sesak dan nyeri pleuritik; pada konsolidasi ditemukan fremitus meningkat, perkusi redup, suara napas bronkial dan crackles lokal.'],
+   [/tuberkulosis/,'Batuk ≥2 minggu, dapat berdahak/berdarah, demam meriang terutama sore, keringat malam, penurunan BB dan nafsu makan; pemeriksaan fisik bisa minimal atau normal.'],
+   [/bronkiolitis/,'Bayi dengan pilek awal diikuti batuk, takipnea, retraksi, crackles/mengi bilateral dan kesulitan menyusu; apnea dapat terjadi pada bayi kecil.'],
+   [/bronkiektasis/,'Batuk berdahak banyak kronik terutama pagi hari, sputum purulen berulang, hemoptisis dan crackles kasar; clubbing dapat ditemukan pada penyakit lama.'],
+   [/efusi pleura/,'Ekspansi hemitoraks menurun, fremitus dan suara napas menurun, perkusi redup/pekak; efusi besar dapat mendorong mediastinum menjauhi sisi sakit.'],
+   [/pneumotoraks/,'Nyeri dada pleuritik dan sesak mendadak, ekspansi sisi sakit menurun, hipersonor dan suara napas menghilang; deviasi trakea/hipotensi mengarah tension pneumothorax.'],
+   [/edema paru/,'Sesak berat, ortopnea, ronki basah bilateral, hipoksemia dan sputum berbusa merah muda; dapat disertai diaphoresis dan tanda gagal jantung.'],
+   [/epiglotitis/,'Demam tinggi, tampak toksik, drooling, disfagia, suara teredam, tripod dan stridor; hindari memeriksa faring secara paksa.'],
+   [/croup|pseudocroup/,'Batuk menggonggong seperti anjing laut, suara serak dan stridor inspirasi, sering memburuk malam hari setelah gejala pilek.'],
+   [/difteri/,'Pseudomembran abu-abu tebal yang melekat kuat, dapat berdarah bila dilepas, disertai faringitis dan limfadenopati leher/bull neck; jangan mengerok membran.'],
+   [/sinusitis/,'Nyeri/tekanan wajah atau gigi atas, sekret hidung purulen dan sumbatan; nyeri tekan sinus dapat ada tetapi tidak cukup untuk memastikan diagnosis bakteri.'],
+   [/rhinitis/,'Bersin berulang, rinore encer dan gatal hidung; pada alergi sering disertai gatal mata, konka pucat-edematous dan allergic salute.']
+  ],
+  Gastrointestinal:[
+   [/kandidiasis/,'Plak putih krem seperti susu pada lidah/pipi yang dapat dikerok dan meninggalkan dasar eritematosa; berbeda dari leukoplakia yang tidak mudah dikerok.'],
+   [/ludwig/,'Indurasi/bengkak keras dasar mulut dan submandibula bilateral, lidah terdorong ke atas-belakang, drooling dan trismus; ancaman utama adalah obstruksi jalan napas.'],
+   [/apendisitis/,'Nyeri awal periumbilikal berpindah ke kuadran kanan bawah, anoreksia, mual dan demam ringan; nyeri tekan titik McBurney, Rovsing/psoas/obturator dapat positif.'],
+   [/kolesistitis/,'Nyeri kuadran kanan atas menetap, sering setelah makanan berlemak, demam dan Murphy sign positif; dapat menjalar ke skapula/bahu kanan.'],
+   [/kolelitiasis/,'Kolik bilier: nyeri episodik epigastrium/kuadran kanan atas setelah makan, dapat menjalar ke punggung/bahu kanan, tanpa demam atau Murphy persisten bila tanpa komplikasi.'],
+   [/kolangitis/,'Trias Charcot: demam/menggigil, nyeri kuadran kanan atas dan ikterus; hipotensi serta penurunan kesadaran (pentad Reynolds) menandakan berat.'],
+   [/hepatitis/,'Malaise, anoreksia, mual, nyeri kuadran kanan atas, urin gelap, feses pucat dan ikterus; hepatomegali nyeri dapat ditemukan.'],
+   [/sirosis|gagal hati kronik/,'Stigmata penyakit hati kronik: spider naevi, palmar eritema, ikterus, ginekomastia, atrofi testis, asites, splenomegali, caput medusae dan asterixis pada ensefalopati.'],
+   [/ulkus peptikum|ulkus gaster|ulkus duodenum/,'Nyeri epigastrium seperti terbakar; pola hubungan dengan makan dapat memberi petunjuk tetapi tidak cukup membedakan lokasi ulkus. Cari melena/hematemesis dan tanda anemia atau perforasi (defans muskular/perut papan).'],
+   [/gerd|refluks gastroesofageal/,'Heartburn retrosternal dan regurgitasi asam, memburuk setelah makan atau berbaring; disfagia, odinofagia, perdarahan atau penurunan BB adalah alarm.'],
+   [/gastroenteritis/,'Diare akut dengan kram perut, mual/muntah; nilai dehidrasi (mukosa kering, mata cekung, turgor turun, CRT memanjang, oliguria) dan darah/lendir pada tinja.'],
+   [/disentri|shigellosis/,'Diare sedikit-sedikit tetapi sering, berlendir/berdarah, tenesmus, demam dan nyeri kolik; tanda dehidrasi serta toksisitas sistemik perlu dinilai.'],
+   [/demam tifoid|tifoid/,'Demam menetap bertahap, sakit kepala, malaise, nyeri perut, konstipasi atau diare; lidah kotor dengan tepi hiperemis dapat ditemukan, rose spots relatif jarang. Bradikardia relatif tidak konsisten dan bukan syarat diagnosis.'],
+   [/hemoroid/,'Perdarahan merah segar saat/setelah BAB; hemoroid internal biasanya tidak nyeri, sedangkan eksternal trombosis nyeri dan teraba benjolan perianal.'],
+   [/fisura ani/,'Nyeri tajam seperti tersayat saat BAB yang dapat menetap setelahnya, dengan darah merah segar sedikit; terlihat robekan linear, sering di garis tengah posterior.'],
+   [/hernia/,'Benjolan pada lipat paha/dinding abdomen membesar saat batuk atau mengejan dan dapat direposisi; nyeri hebat, irreponibel, muntah atau distensi curiga inkarserasi/strangulasi.'],
+   [/obstruksi usus/,'Nyeri kolik, muntah, distensi dan tidak bisa flatus/BAB; bising usus dapat meningkat bernada tinggi awalnya lalu menurun pada fase lanjut/ileus.'],
+   [/pankreatitis/,'Nyeri epigastrium hebat menembus ke punggung, memburuk setelah makan/berbaring dan dapat membaik membungkuk ke depan; mual-muntah dan nyeri tekan epigastrium.'],
+   [/gastrointestinal bleeding|perdarahan saluran cerna/,'Hematemesis/coffee-ground atau melena pada perdarahan atas; hematokezia lebih sering bawah tetapi perdarahan atas masif juga bisa. Cari pucat, takikardia, hipotensi ortostatik dan tanda syok.'],
+   [/giardiasis|giardia/,'Diare berbau menyengat/berminyak, kembung dan flatulensi, dapat berlangsung lama dengan malabsorpsi; darah pada tinja bukan ciri khas.'],
+   [/askariasis|ascariasis/,'Sering tanpa gejala; beban cacing tinggi dapat menyebabkan nyeri/distensi atau obstruksi usus, sedangkan fase migrasi larva dapat menimbulkan batuk dan wheezing sementara.'],
+   [/taeniasis/,'Sering asimtomatik atau keluhan perut ringan; segmen/proglotid cacing dapat terlihat keluar bersama tinja. Gejala neurologis/kejang pada sistiserkosis memerlukan evaluasi berbeda.'],
+   [/cacing tambang|ankilostomiasis|hookworm/,'Sering tanpa gejala; infeksi kronik menyebabkan anemia defisiensi besi, pucat, lemah dan kadang edema; larva dapat menimbulkan ground itch di tempat penetrasi kulit.'],
+   [/strongiloidiasis|strongyloides/,'Dapat ada larva currens: ruam linear/urtikaria yang bergerak cepat, gatal, sering di bokong/paha; pada hiperinfeksi dapat timbul nyeri abdomen, diare, ileus dan sepsis.'],
+   [/diare kronik/,'Nilai durasi ≥4 minggu, penurunan BB, gejala malam, steatorrhea, darah, demam, dehidrasi dan tanda malabsorpsi; karakter tinja membantu menentukan penyebab.'],
+   [/konstipasi/,'BAB jarang/keras, mengejan, rasa tidak tuntas atau perlu manuver; distensi/nyeri tekan dapat ada. Alarm: darah, anemia, penurunan BB, onset baru usia lanjut.']
+  ],
+  Neurologi:[
+   [/stroke/,'Defisit neurologis fokal mendadak sesuai wilayah vaskular: wajah mencong, kelemahan/lumpuh satu sisi, gangguan bicara/afasia, hemianopia atau ataksia; catat last-known-well.'],
+   [/meningitis/,'Demam, sakit kepala, kaku kuduk, fotofobia dan perubahan kesadaran; Kernig/Brudzinski dapat positif tetapi sensitivitasnya terbatas. Petekie/purpura adalah red flag meningokokus.'],
+   [/ensefalitis/,'Perubahan perilaku/kesadaran, demam, kejang atau defisit fokal; gangguan memori/bahasa dan gejala psikiatrik akut dapat menonjol pada ensefalitis HSV.'],
+   [/kejang demam/,'Usia tipikal 6–60 bulan, demam, kejang generalisata singkat dan pulih ke kondisi neurologis dasar; kejang fokal, ≥15 menit atau berulang dalam 24 jam berarti kompleks.'],
+   [/epilepsi|kejang/,'Bangkitannya stereotip dan berulang; dapat ada aura, deviasi kepala/mata, fase tonik-klonik, gigitan lidah lateral dan kebingungan pascaiktal. Bedakan sinkop dan serangan non-epileptik.'],
+   [/parkinson/,'Bradikinesia wajib disertai rigiditas dan/atau tremor istirahat; tremor seperti pill-rolling, langkah kecil, freezing dan berkurangnya ayunan lengan.'],
+   [/bell|palsi nervus fasialis/,'Kelemahan seluruh hemiface ipsilateral termasuk dahi: tidak dapat mengerutkan dahi/menutup mata rapat dan sudut mulut turun; onset akut, tanpa defisit neurologis lain pada Bell palsy tipikal.'],
+   [/vertigo perifer|neuritis vestibular|bppv/,'BPPV: vertigo singkat dipicu perubahan posisi dengan nistagmus posisional; neuritis vestibular: vertigo kontinu berjam-jam–hari tanpa gangguan pendengaran. Defisit fokal/ataksia berat curiga sentral.'],
+   [/migren|migrain/,'Nyeri kepala berdenyut, sering unilateral, sedang-berat, memburuk dengan aktivitas, disertai mual dan/atau fotofobia-fonofobia; aura reversibel dapat mendahului nyeri.'],
+   [/nyeri kepala tipe tegang/,'Nyeri bilateral seperti ditekan/diikat, ringan-sedang, tidak memburuk dengan aktivitas rutin dan tanpa muntah; otot perikranial dapat nyeri tekan.'],
+   [/perdarahan subaraknoid/,'Thunderclap headache: nyeri kepala sangat hebat mencapai puncak dalam ≤1 menit, dapat disertai muntah, kaku kuduk, fotofobia atau penurunan kesadaran.'],
+   [/radikulopati|hernia nukleus pulposus/,'Nyeri menjalar mengikuti dermatom, parestesia dan kelemahan miotom; straight-leg raise dapat mereproduksi nyeri radikuler lumbosakral. Saddle anesthesia/retensi urin adalah red flag cauda equina.'],
+   [/neuropati perifer/,'Pola distal simetris “stocking-glove”, penurunan sensasi getar/monofilamen, refleks Achilles menurun dan dapat disertai kelemahan distal.'],
+   [/tetanus/,'Trismus, risus sardonicus, rigiditas aksial dan spasme nyeri yang dipicu rangsangan; kesadaran umumnya tetap baik.']
+  ],
+  Psikiatri:[
+   [/delirium/,'Awitan akut (jam–hari), gangguan perhatian dan kesadaran yang berfluktuasi; tipe hipoaktif mudah terlewat.'],
+   [/depresi/,'Mood depresif dan/atau anhedonia hampir setiap hari ≥2 minggu, disertai perubahan tidur/nafsu makan, energi, konsentrasi, rasa bersalah atau ide kematian; nilai risiko bunuh diri.'],
+   [/mania|bipolar/,'Mood meningkat/iritabel dengan energi dan aktivitas meningkat, kebutuhan tidur berkurang tanpa lelah, bicara cepat, flight of ideas, grandiositas dan perilaku berisiko; gangguan fungsi/psikosis menunjukkan berat.'],
+   [/skizofrenia/,'Gejala psikotik menetap seperti waham, halusinasi, bicara/perilaku terdisorganisasi atau gejala negatif; nilai durasi, penurunan fungsi dan singkirkan zat/kondisi medis.'],
+   [/gangguan panik/,'Serangan takut/intens tidak nyaman yang memuncak dalam menit dengan palpitasi, sesak, tremor, berkeringat, nyeri dada atau takut mati; serangan berulang tak terduga diikuti kekhawatiran/perubahan perilaku.'],
+   [/gangguan cemas menyeluruh|gad/,'Kekhawatiran berlebihan sulit dikendalikan tentang banyak hal, berlangsung berbulan-bulan, disertai gelisah, mudah lelah, tegang otot, sulit konsentrasi atau gangguan tidur.'],
+   [/ptsd|stres pascatrauma/,'Paparan trauma diikuti intrusi/flashback atau mimpi buruk, penghindaran, perubahan kognisi/mood dan hiperwaspada; gejala menetap >1 bulan untuk PTSD.'],
+   [/obsesif kompulsif|ocd/,'Obsesi berupa pikiran/impuls intrusif dan/atau kompulsi berulang untuk menurunkan kecemasan; menyita waktu atau mengganggu fungsi, umumnya disadari berlebihan.'],
+   [/demensia|gangguan neurokognitif/,'Penurunan kognitif dari baseline yang mengganggu kemandirian; onset umumnya perlahan dan perhatian relatif lebih terjaga pada fase awal dibanding delirium.'],
+   [/intoksikasi/,'Temuan bergantung zat: opioid—miosis dan depresi napas; stimulan—midriasis, takikardia, hipertensi, hipertermia dan agitasi; alkohol/sedatif—disartria, ataksia dan penurunan kesadaran.']
+  ]
+ };
+ const list=rules[system]||[];
+ const hit=list.find(([re])=>re.test(t));
+ return hit?hit[1]:'';
 }
+function expandExistingSection(title,system,heading,original,index=0){
+ if(!/tanda dan gejala klinis/i.test(heading)||index!==0)return original;
+ const extra=clinicalSignature(title,system);
+ return extra?String(original)+' Temuan khas yang perlu dicari: '+extra:original;
+}
+
 function likelyMeningeal(t){return /meningitis|ensefalitis|perdarahan subaraknoid/.test(t);}
 
 function renderStudyItems(arr,fn){
@@ -1425,7 +1532,7 @@ function openCardioLesson(i){
  ];
  const ecg=ecgImages.find(x=>l.title.toLowerCase().includes(x.match.toLowerCase()));
  const imageBlock=ecg?'<section class="study-ecg"><h3>Gambaran EKG</h3><img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(ecg.file)+'" alt="'+ecg.title+'" /><p class="muted">'+ecg.title+'. Gunakan gambar untuk latihan mengenali pola; interpretasi tetap harus dikaitkan dengan kondisi klinis dan EKG 12 sadapan pasien.</p><a href="'+ecg.source+'" target="_blank" rel="noopener">Sumber gambar Wikimedia Commons</a></section>':'';
- $('studyDetail').innerHTML='<div class="tag">STASE KARDIOVASKULAR</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+cardioKeyHtml(l)+hypertensionDetailHtml(l)+imageBlock+diagnosticResultPanel(l.title,'Kardiovaskular')+l.sections.filter(p=>!p[0].toLowerCase().includes('diagnosis dan diagnosis banding')).map((p,n)=>{const items=studyBulletItems(p[1]);return '<section class="study-points"><h3>'+p[0]+'</h3><ul>'+items.map(x=>'<li>'+expandExistingSection(l.title,'Kardiovaskular',p[0],x)+'</li>').join('')+'</ul></section>';})+differentialHtml(l.title,'Kardiovaskular')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="secondary" '+(i===0?'disabled':'')+' onclick="openCardioLesson('+(i-1)+')">← Diagnosis sebelumnya</button><button class="teal" '+(i===cardioLessons.length-1?'disabled':'')+' onclick="openCardioLesson('+(i+1)+')">Diagnosis berikutnya →</button></div>';
+ $('studyDetail').innerHTML='<div class="tag">STASE KARDIOVASKULAR</div><h2>'+l.title+'</h2><p class="muted">'+l.sub+'</p>'+cardioKeyHtml(l)+hypertensionDetailHtml(l)+imageBlock+diagnosticResultPanel(l.title,'Kardiovaskular')+l.sections.filter(p=>!p[0].toLowerCase().includes('diagnosis dan diagnosis banding')).map((p,n)=>{const items=studyBulletItems(p[1]);return '<section class="study-points"><h3>'+p[0]+'</h3><ul>'+items.map((x,j)=>'<li>'+expandExistingSection(l.title,'Kardiovaskular',p[0],x,j)+'</li>').join('')+'</ul></section>';})+differentialHtml(l.title,'Kardiovaskular')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="secondary" '+(i===0?'disabled':'')+' onclick="openCardioLesson('+(i-1)+')">← Diagnosis sebelumnya</button><button class="teal" '+(i===cardioLessons.length-1?'disabled':'')+' onclick="openCardioLesson('+(i+1)+')">Diagnosis berikutnya →</button></div>';
 }
 
 const studyPearls={
