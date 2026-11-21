@@ -1012,10 +1012,59 @@ function clinicalSignature(title,system){
 }
 function expandExistingSection(title,system,heading,original,index=0){
  if(!/tanda dan gejala klinis/i.test(heading)||index!==0)return original;
+ const t=String(title||'').toLowerCase();
+ const glossary={
+  Kardiovaskular:[
+   [/gagal jantung|kor pulmonale/,'JVP (jugular venous pressure: tinggi tekanan vena jugularis, dinilai dari pulsasi vena leher); S3 (bunyi jantung tambahan awal diastol yang dapat muncul pada gagal jantung); edema pitting (cekungan menetap sesaat setelah kulit ditekan).'],
+   [/angina|infark miokard/,'Substernal (di belakang tulang dada); diaphoresis (keringat dingin/berlebihan); ekuivalen angina (sesak atau kelelahan akibat iskemia tanpa nyeri dada khas).'],
+   [/fibrilasi atrium|atrial flutter|takikardia|ekstrasistol|fibrilasi ventrikel/,'Ireguler-ireguler (jarak antar denyut tidak berpola); QRS (kompleks EKG yang menggambarkan depolarisasi ventrikel); disosiasi AV (aktivitas atrium dan ventrikel tidak saling mengikuti).'],
+   [/limfedema/,'Stemmer sign (kulit di pangkal jari kaki sulit dicubit/diangkat, mendukung limfedema); pitting (meninggalkan cekungan setelah ditekan), non-pitting (tidak meninggalkan cekungan).'],
+   [/syok/,'CRT (capillary refill time: waktu kembalinya warna kuku setelah ditekan; memanjang pada perfusi buruk); oliguria (produksi urin menurun); akral (ujung tangan dan kaki).'],
+   [/insufisiensi vena/,'Hemosiderin (pigmen besi yang menyebabkan kulit kecokelatan); maleolus medialis (tonjolan mata kaki bagian dalam).'],
+   [/tromboflebitis/,'Cord-like (vena meradang teraba seperti tali keras di bawah kulit); unilateral (hanya pada satu sisi/tungkai).']
+  ],
+  Gastrointestinal:[
+   [/apendisitis/,'McBurney (nyeri tekan di titik sepertiga lateral garis umbilikus–SIAS kanan); Rovsing (tekan kuadran kiri bawah menimbulkan nyeri kanan bawah); psoas (nyeri saat ekstensi panggul kanan atau fleksi melawan tahanan); obturator (nyeri saat panggul dan lutut difleksikan lalu paha dirotasi internal).'],
+   [/kolesistitis/,'Murphy sign (tekan bawah iga kanan di area kandung empedu saat pasien menarik napas; inspirasi terhenti karena nyeri).'],
+   [/kolangitis/,'Trias Charcot (demam/menggigil, nyeri perut kanan atas, ikterus); pentad Reynolds (trias Charcot ditambah hipotensi dan gangguan kesadaran).'],
+   [/sirosis|gagal hati/,'Asterixis (gerakan mengepak singkat saat pergelangan tangan diekstensikan); caput medusae (vena melebar di sekitar pusar); spider naevi (pelebaran pembuluh kecil menyerupai laba-laba).'],
+   [/hemoroid/,'Hemoroid internal (di atas linea dentata, biasanya tidak nyeri); eksternal (di bawah linea dentata, dapat nyeri terutama bila trombosis).'],
+   [/fisura ani/,'Fisura ani (robekan linear pada kulit/mukosa anus, sering di garis tengah posterior).'],
+   [/ludwig/,'Trismus (mulut sulit dibuka); drooling (air liur menetes karena sulit menelan).'],
+   [/ulkus peptikum/,'Defans muskular/perut papan (otot perut menegang involunter akibat iritasi peritoneum, dapat menandakan perforasi).'],
+   [/hernia/,'Impulse batuk (benjolan membesar/terasa terdorong saat batuk); irreponibel (benjolan tidak dapat dimasukkan kembali).']
+  ],
+  Respirasi:[
+   [/asma|ppok|bronkitis|bronkiolitis/,'Wheezing/mengi (bunyi musik bernada tinggi akibat penyempitan jalan napas); ekspirasi memanjang (menghembuskan napas lebih lama); silent chest (suara napas sangat lemah karena aliran udara minimal, tanda serangan berat).'],
+   [/pneumonia/,'Fremitus meningkat (getaran suara yang diraba di dinding dada lebih kuat); suara napas bronkial (suara napas keras seperti di atas trakea yang terdengar di perifer paru); crackles (bunyi letupan halus, terutama saat inspirasi).'],
+   [/efusi pleura/,'Fremitus menurun (getaran suara di dinding dada melemah); perkusi redup/pekak (bunyi ketukan kurang resonan karena cairan); suara napas menurun (aliran udara terdengar lebih lemah).'],
+   [/pneumotoraks/,'Hipersonor (bunyi perkusi lebih nyaring karena udara); deviasi trakea (batang tenggorok bergeser, tanda lanjut); tension pneumothorax (udara terperangkap menekan paru dan sirkulasi, kegawatdaruratan).'],
+   [/croup|pseudocroup/,'Stridor inspirasi (bunyi kasar bernada tinggi saat menarik napas akibat sumbatan jalan napas atas); barking cough (batuk menggonggong khas croup).'],
+   [/epiglotitis/,'Drooling (air liur menetes karena sulit menelan); tripod (duduk condong ke depan untuk membantu bernapas); stridor (bunyi napas kasar akibat penyempitan jalan napas atas).'],
+   [/pertusis/,'Whoop (suara tarikan napas bernada tinggi setelah rentetan batuk); post-tussive vomiting (muntah setelah serangan batuk).'],
+   [/difteri/,'Pseudomembran (selaput tebal yang melekat pada mukosa); bull neck (leher tampak membesar akibat pembengkakan kelenjar dan jaringan lunak).']
+  ],
+  Neurologi:[
+   [/meningitis/,'Kaku kuduk (tahanan/nyeri saat leher difleksikan pasif); Kernig (nyeri/tahanan saat lutut diluruskan dengan panggul fleksi); Brudzinski (fleksi leher memicu fleksi panggul dan lutut).'],
+   [/stroke/,'Afasia (gangguan memahami atau menghasilkan bahasa); hemiparesis (kelemahan satu sisi tubuh); hemianopia (hilangnya separuh lapang pandang).'],
+   [/parkinson/,'Bradikinesia (gerakan lambat dan amplitudo mengecil); rigiditas (tahanan otot saat sendi digerakkan pasif); tremor istirahat (gemetar saat anggota tubuh tidak digunakan).'],
+   [/radikulopati|hernia nukleus/,'Dermatom (area kulit yang dipersarafi satu akar saraf); miotom (kelompok otot yang dipersarafi satu akar saraf); straight-leg raise (tungkai lurus diangkat untuk memicu nyeri radikuler).'],
+   [/kejang/,'Aura (gejala awal yang dirasakan sebelum kejang); fase postiktal (masa pemulihan setelah kejang, dapat berupa bingung/mengantuk); generalisata (melibatkan kedua hemisfer otak).'],
+   [/bell|fasialis/,'Hemiface (satu sisi wajah); pada kelumpuhan saraf fasialis perifer, kelemahan biasanya mengenai dahi dan sudut mulut pada sisi yang sama.']
+  ],
+  Psikiatri:[
+   [/delirium/,'Inatensi (sulit memusatkan dan mempertahankan perhatian); fluktuasi (gejala/kesadaran berubah-ubah); hipoaktif (tampak diam, lamban atau mengantuk).'],
+   [/depresi/,'Anhedonia (hilangnya minat atau kemampuan menikmati aktivitas); ide bunuh diri (pikiran ingin mati atau mengakhiri hidup, perlu ditanyakan langsung dan dinilai risikonya).'],
+   [/mania|bipolar/,'Flight of ideas (aliran ide sangat cepat dan berpindah topik); grandiositas (keyakinan berlebihan tentang kemampuan/kepentingan diri); kebutuhan tidur berkurang (tidur sedikit tetapi tetap bertenaga).'],
+   [/skizofrenia|psikosis/,'Waham (keyakinan salah yang menetap meski ada bukti berlawanan); halusinasi (persepsi tanpa rangsang nyata); gejala negatif (berkurangnya ekspresi emosi, motivasi atau bicara).'],
+   [/obsesif kompulsif|ocd/,'Obsesi (pikiran intrusif berulang yang menimbulkan cemas); kompulsi (perilaku/ritual mental berulang untuk mengurangi cemas).'],
+   [/panik/,'Serangan panik (lonjakan ketakutan hebat yang memuncak dalam beberapa menit dan disertai gejala fisik/otonom).']
+  ]
+ };
+ const item=(glossary[system]||[]).find(([re])=>re.test(t));
  const extra=clinicalSignature(title,system);
- return extra?String(original)+' Temuan khas yang perlu dicari: '+extra:original;
+ return String(original)+(extra?' Temuan khas yang perlu dicari: '+extra:'')+(item?' Istilah pemeriksaan: '+item[1]:'');
 }
-
 function likelyMeningeal(t){return /meningitis|ensefalitis|perdarahan subaraknoid/.test(t);}
 
 function renderStudyItems(arr,fn){
