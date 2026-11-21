@@ -18,20 +18,20 @@ button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;pad
 .chat{height:230px;overflow:auto;background:#f7f9fc;border:1px solid var(--line);padding:12px;border-radius:12px;margin:10px 0}.bubble{max-width:88%;padding:9px 12px;border-radius:12px;margin:7px 0;font-size:14px}.patient{background:#e8eef5}.doctor{background:#dff4ef;margin-left:auto}.quick{display:flex;flex-wrap:wrap;gap:6px}.quick button{font-size:12px;padding:7px 9px}
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}.checks label{border:1px solid var(--line);border-radius:9px;padding:9px;font-size:13px;display:flex;gap:8px;align-items:flex-start}.checks input{width:auto;margin-top:4px}
 .result{background:#f0faf8;border-left:4px solid var(--teal);padding:12px;border-radius:8px;margin-top:10px}.score{font-size:32px;font-weight:850;color:var(--teal)}
-.hidden{display:none!important}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+.hidden{display:none!important}.timer-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.catalog-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:560px;overflow:auto}.catalog-item{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);padding:9px 10px;border-radius:9px;font-size:13px;background:#fff}.catalog-item b{font-weight:600}.catalog-item .tag{flex-shrink:0}.catalog-item small{color:var(--muted)}@media(max-width:800px){.catalog-list{grid-template-columns:1fr}}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.checks{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}}
 </style></head>
 <body>
 <header><div><div class="logo">MED<span>OSCE</span></div><div class="sub">Clinical skills practice • Simulasi OSCE Kedokteran</div></div><div class="sub">Latihan mandiri · Bahasa Indonesia</div></header>
 <div class="wrap"><div class="layout">
-<aside class="panel"><h2>Daftar stasiun</h2><div class="muted">Pilih kasus untuk memulai simulasi.</div><div class="filters"><select id="levelFilter"><option value="all">Semua level</option><option>4A</option><option>3A</option><option>3B</option></select><select id="specFilter"><option value="all">Semua bagian</option><option>Interna</option><option>Bedah</option><option>Anak</option><option>Neuro</option><option>Respirasi</option><option>Kulit</option><option>Urologi</option></select></div><div id="caseList"></div><div class="muted">Tips: lakukan anamnesis, pemeriksaan fisik, tentukan diagnosis, lalu susun tatalaksana.</div></aside>
+<aside class="panel"><h2>Daftar stasiun</h2><div class="muted">Pilih kasus untuk memulai simulasi.</div><div class="filters"><select id="levelFilter"><option value="all">Semua level</option><option>4A</option><option>3A</option><option>3B</option></select><select id="specFilter"><option value="all">Semua bagian</option><option>Interna</option><option>Bedah</option><option>Anak</option><option>Neuro</option><option>Respirasi</option><option>Kulit</option><option>Urologi</option><option>Cardio</option><option>Gastro</option><option>Obsgyn</option><option>Hematologi</option><option>Muskuloskeletal</option><option>THT</option><option>Mata</option><option>Endokrin</option><option>Forensik</option></select></div><div id="caseList"></div><div class="muted">Tips: lakukan anamnesis, pemeriksaan fisik, tentukan diagnosis, lalu susun tatalaksana.</div></aside>
 <main>
-<section class="card"><div class="topline"><div><span class="tag green">SIMULASI AKTIF</span><span class="tag" id="levelTag">4A</span><h2 id="caseTitle" style="margin:8px 0 2px">Pilih kasus</h2><div class="muted" id="caseIntro">Pilih stasiun di sebelah kiri untuk mulai.</div></div><div><div class="timer" id="timer">10:00</div><button class="secondary" id="resetTimer">Reset timer</button></div></div><div id="brief" class="result hidden"></div></section>
+<section class="card"><div class="topline"><div><span class="tag green">SIMULASI AKTIF</span><span class="tag" id="levelTag">4A</span><h2 id="caseTitle" style="margin:8px 0 2px">Pilih kasus</h2><div class="muted" id="caseIntro">Pilih stasiun di sebelah kiri untuk mulai.</div></div><div><div class="timer" id="timer">12:00</div><div class="timer-actions"><button class="secondary" id="pauseTimer">Pause</button><button class="secondary" id="resetTimer">Reset 12:00</button></div></div></div><div id="brief" class="result hidden"></div></section>
 <section class="card"><h2>1. Anamnesis — wawancarai pasien</h2><div class="muted">Pilih pertanyaan atau ketik pertanyaan sendiri. Respons pasien berupa simulasi terstruktur.</div><div class="chat" id="chat"><div class="bubble patient">Selamat pagi, Dok. Saya datang karena merasa kurang enak badan.</div></div><div class="quick" id="quick"></div><div class="field"><input id="question" placeholder="Ketik pertanyaan anamnesis..."></div><button id="askBtn">Tanyakan</button></section>
 <section class="card"><h2>2. Pemeriksaan fisik & penunjang</h2><div class="muted">Pilih pemeriksaan yang ingin dilakukan, lalu tampilkan hasilnya.</div><div class="checks" id="examChecks"></div><button class="teal" id="showExam" style="margin-top:12px">Tampilkan hasil pemeriksaan</button><div id="examResult"></div></section>
 <section class="card"><h2>3. Diagnosis kerja</h2><div class="field"><label>Pilih diagnosis paling mungkin</label><select id="diagnosis"><option value="">— Pilih diagnosis —</option></select></div><div class="field"><label>Diagnosis banding (opsional)</label><input id="ddx" placeholder="Tuliskan diagnosis banding"></div></section>
 <section class="card"><h2>4. Tatalaksana</h2><div class="muted">Centang langkah yang sesuai dengan kondisi pasien.</div><div class="checks" id="managementChecks"></div><div class="field"><label>Rencana resep / instruksi terapi</label><textarea id="prescription" placeholder="Tuliskan nama obat, dosis, frekuensi, rute, dan durasi bila diperlukan..."></textarea></div><div class="field"><label>Edukasi dan follow-up</label><textarea id="education" placeholder="Tuliskan edukasi, tanda bahaya, dan rencana kontrol..."></textarea></div><button class="teal" id="finish">Selesaikan & nilai jawaban</button></section>
-<section class="card hidden" id="evaluation"><h2>Hasil evaluasi stasiun</h2><div class="score" id="score">0/100</div><div id="feedback"></div><button class="secondary" onclick="window.print()">Cetak hasil</button> <button onclick="nextCase()">Lanjut kasus berikutnya</button></section>
+<section class="card" id="catalogCard"><div class="topline"><div><h2>Bank penyakit SKDI 2012</h2><div class="muted">Daftar kompetensi 4A, 3A, dan 3B dikelompokkan menurut sistem/stase. Katalog ini adalah peta cakupan; setiap penyakit perlu skenario OSCE tersendiri.</div></div><span class="tag green" id="catalogCount">0 penyakit</span></div><div class="filters"><select id="catalogSpec"><option value="all">Semua stase/sistem</option></select><select id="catalogLevel"><option value="all">Semua kompetensi</option><option>4A</option><option>3A</option><option>3B</option></select><input id="catalogSearch" placeholder="Cari nama penyakit..." style="max-width:260px"></div><div id="catalogList" class="catalog-list"></div><p class="muted" style="margin-top:12px">Acuan: SKDI 2012, Lampiran Daftar Penyakit. Pengelompokan ke stase dibuat untuk kebutuhan belajar; beberapa penyakit dapat dibahas lintas bagian.</p></section><section class="card hidden" id="evaluation"><h2>Hasil evaluasi stasiun</h2><div class="score" id="score">0/100</div><div id="feedback"></div><button class="secondary" onclick="window.print()">Cetak hasil</button> <button onclick="nextCase()">Lanjut kasus berikutnya</button></section>
 </main></div></div><footer>MEDOSCE · Media latihan edukasi, bukan pengganti penilaian instruktur atau pedoman klinis resmi.</footer>
 <script>
 const cases=[
@@ -47,10 +47,10 @@ const cases=[
 {id:'pneumonia',title:'Batuk demam dan takipnea — Pneumonia',spec:'Respirasi',level:'3A',intro:'Laki-laki 34 tahun batuk berdahak, demam, dan sesak 3 hari.',brief:'Demam, batuk produktif, takipnea, dan temuan konsolidasi mendukung pneumonia komunitas.',dx:['Pneumonia komunitas','Bronkitis akut','Tuberkulosis paru','Asma eksaserbasi'],exam:['Tanda vital dan saturasi','Inspeksi toraks','Palpasi dan perkusi toraks','Auskultasi paru','Foto toraks','Darah lengkap'],findings:{'Tanda vital dan saturasi':'Suhu 38,5°C, RR 26x/menit, SpO₂ 93%.','Inspeksi toraks':'Takipnea ringan.','Palpasi dan perkusi toraks':'Fremitus meningkat dan redup di basal kanan.','Auskultasi paru':'Krepitasi basal kanan.','Foto toraks':'Infiltrat lobus bawah kanan.','Darah lengkap':'Leukositosis neutrofilia.'},mgmt:['Nilai derajat keparahan dan kebutuhan rawat','Berikan oksigen bila hipoksemia','Antibiotik empiris sesuai pedoman dan komorbid','Cairan dan antipiretik sesuai kebutuhan','Evaluasi respons 48–72 jam','Edukasi kepatuhan antibiotik dan tanda bahaya'],correct:'Pneumonia komunitas',answers:{keluhan:'Saya batuk berdahak dan demam.',onset:'Tiga hari, makin sesak.',penyerta:'Menggigil dan nyeri dada saat batuk.',riwayat:'Tidak ada riwayat penyakit paru.',obat:'Minum obat batuk warung.',alergi:'Tidak ada.'}},
 {id:'anemia',title:'Lemas dan pucat — Anemia defisiensi besi',spec:'Interna',level:'4A',intro:'Perempuan 28 tahun mudah lelah, pusing, dan haid banyak.',brief:'Gejala anemia dengan kemungkinan kehilangan darah menstruasi kronis. Konfirmasi dengan darah lengkap dan ferritin.',dx:['Anemia defisiensi besi','Talasemia','Anemia penyakit kronis','Defisiensi vitamin B12'],exam:['Tanda vital','Konjungtiva dan kuku','Darah lengkap indeks eritrosit','Ferritin serum','Evaluasi sumber perdarahan'],findings:{'Tanda vital':'Hemodinamik stabil.','Konjungtiva dan kuku':'Konjungtiva pucat, kuku rapuh.','Darah lengkap indeks eritrosit':'Hb 9,2 g/dL, MCV rendah, MCH rendah.','Ferritin serum':'Ferritin rendah.','Evaluasi sumber perdarahan':'Riwayat menstruasi banyak dan lama.'},mgmt:['Nilai derajat anemia dan stabilitas','Konfirmasi defisiensi besi dan cari penyebab','Terapi besi oral sesuai dosis elemental dan toleransi','Edukasi cara minum besi dan efek samping','Tatalaksana sumber perdarahan','Evaluasi Hb dan respons terapi'],correct:'Anemia defisiensi besi',answers:{keluhan:'Saya gampang capek dan sering pusing.',onset:'Sudah beberapa bulan.',penyerta:'Kadang berdebar, tidak sesak saat istirahat.',riwayat:'Haid saya banyak dan berlangsung sekitar tujuh hari.',obat:'Belum minum suplemen zat besi.',alergi:'Tidak ada.'}}
 ];
-let current=cases[0],seconds=600,clock;
+let current=cases[0],seconds=720,clock,paused=false;
 const $=id=>document.getElementById(id);
 function renderList(){let level=$('levelFilter').value,spec=$('specFilter').value;$('caseList').innerHTML='';cases.filter(c=>(level==='all'||c.level===level)&&(spec==='all'||c.spec===spec)).forEach(c=>{let b=document.createElement('button');b.className='case'+(current.id===c.id?' active':'');b.innerHTML='<b>'+c.title+'</b><br><span class="tag">'+c.level+'</span><span class="muted">'+c.spec+'</span>';b.onclick=()=>loadCase(c);$('caseList').append(b)})}
-function loadCase(c){current=c;$('caseTitle').textContent=c.title;$('caseIntro').textContent=c.intro;$('levelTag').textContent=c.level;$('brief').textContent=c.brief;$('brief').classList.remove('hidden');$('chat').innerHTML='<div class="bubble patient">Selamat pagi, Dok. Saya datang karena '+c.intro.toLowerCase()+'</div>';$('quick').innerHTML='';Object.keys(c.answers).forEach(k=>{let b=document.createElement('button');b.className='secondary';b.textContent=({keluhan:'Keluhan utama',onset:'Awitan',penyerta:'Gejala penyerta',riwayat:'Riwayat penyakit',obat:'Obat yang digunakan',alergi:'Alergi'}[k]);b.onclick=()=>ask(k);$('quick').append(b)});$('examChecks').innerHTML='';c.exam.forEach((e,i)=>$('examChecks').insertAdjacentHTML('beforeend','<label><input type="checkbox" value="'+e+'"> '+e+'</label>'));$('managementChecks').innerHTML='';c.mgmt.forEach((m,i)=>$('managementChecks').insertAdjacentHTML('beforeend','<label><input type="checkbox" value="'+i+'"> '+m+'</label>'));$('diagnosis').innerHTML='<option value="">— Pilih diagnosis —</option>'+c.dx.map(d=>'<option>'+d+'</option>').join('');$('examResult').innerHTML='';$('prescription').value='';$('education').value='';$('ddx').value='';$('evaluation').classList.add('hidden');seconds=600;showTime();renderList()}
+function loadCase(c){current=c;$('caseTitle').textContent=c.title;$('caseIntro').textContent=c.intro;$('levelTag').textContent=c.level;$('brief').textContent=c.brief;$('brief').classList.remove('hidden');$('chat').innerHTML='<div class="bubble patient">Selamat pagi, Dok. Saya datang karena '+c.intro.toLowerCase()+'</div>';$('quick').innerHTML='';Object.keys(c.answers).forEach(k=>{let b=document.createElement('button');b.className='secondary';b.textContent=({keluhan:'Keluhan utama',onset:'Awitan',penyerta:'Gejala penyerta',riwayat:'Riwayat penyakit',obat:'Obat yang digunakan',alergi:'Alergi'}[k]);b.onclick=()=>ask(k);$('quick').append(b)});$('examChecks').innerHTML='';c.exam.forEach((e,i)=>$('examChecks').insertAdjacentHTML('beforeend','<label><input type="checkbox" value="'+e+'"> '+e+'</label>'));$('managementChecks').innerHTML='';c.mgmt.forEach((m,i)=>$('managementChecks').insertAdjacentHTML('beforeend','<label><input type="checkbox" value="'+i+'"> '+m+'</label>'));$('diagnosis').innerHTML='<option value="">— Pilih diagnosis —</option>'+c.dx.map(d=>'<option>'+d+'</option>').join('');$('examResult').innerHTML='';$('prescription').value='';$('education').value='';$('ddx').value='';$('evaluation').classList.add('hidden');seconds=720;paused=false;$('pauseTimer').textContent='Pause';showTime();renderList()}
 function ask(k){let q=({keluhan:'Apa keluhan utama?',onset:'Sejak kapan dan bagaimana awal keluhannya?',penyerta:'Apakah ada gejala lain yang menyertai?',riwayat:'Apakah ada riwayat penyakit sebelumnya?',obat:'Obat apa yang sedang digunakan?',alergi:'Apakah ada alergi obat atau makanan?'}[k]);$('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+current.answers[k]+'</div>');$('chat').scrollTop=$('chat').scrollHeight}
 $('askBtn').onclick=()=>{let q=$('question').value.trim();if(!q)return;let low=q.toLowerCase(),k=low.includes('alerg')?'alergi':low.includes('obat')?'obat':low.includes('sejak')||low.includes('kapan')?'onset':low.includes('riwayat')?'riwayat':low.includes('gejala lain')||low.includes('penyerta')?'penyerta':'keluhan';$('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+current.answers[k]+'</div>');$('question').value='';$('chat').scrollTop=$('chat').scrollHeight};
 $('question').addEventListener('keydown',e=>{if(e.key==='Enter')$('askBtn').click()});
@@ -59,8 +59,135 @@ function evaluate(){let dx=$('diagnosis').value,selected=[...document.querySelec
 $('finish').onclick=evaluate;
 function nextCase(){let i=cases.findIndex(c=>c.id===current.id);loadCase(cases[(i+1)%cases.length]);window.scrollTo({top:0,behavior:'smooth'})}
 function showTime(){let m=String(Math.floor(seconds/60)).padStart(2,'0'),s=String(seconds%60).padStart(2,'0');$('timer').textContent=m+':'+s}
-function tick(){if(seconds>0){seconds--;showTime()}else clearInterval(clock)}
-$('resetTimer').onclick=()=>{seconds=600;showTime()};
+function tick(){if(!paused&&seconds>0){seconds--;showTime()}else if(seconds===0){clearInterval(clock);$('pauseTimer').textContent='Selesai'}}
+$('pauseTimer').onclick=()=>{if(seconds===0)return;paused=!paused;$('pauseTimer').textContent=paused?'Lanjutkan':'Pause'};
+$('resetTimer').onclick=()=>{seconds=720;paused=false;$('pauseTimer').textContent='Pause';showTime()};
 $('levelFilter').onchange=renderList;$('specFilter').onchange=renderList;
 clock=setInterval(tick,1000);loadCase(cases[0]);
+
+const diseaseBank = [
+['Kardiovaskular','Syok (septik, hipovolemik, kardiogenik, neurogenik)','3B'],
+['Kardiovaskular','Angina pektoris','3B'],['Kardiovaskular','Infark miokard','3B'],['Kardiovaskular','Gagal jantung akut','3B'],
+['Kardiovaskular','Gagal jantung kronik','3A'],['Kardiovaskular','Cardiorespiratory arrest','3B'],
+['Kardiovaskular','Takikardia supraventrikular/ventrikular','3B'],['Kardiovaskular','Fibrilasi atrial','3A'],
+['Kardiovaskular','Fibrilasi ventrikular','3B'],['Kardiovaskular','Atrial flutter','3B'],
+['Kardiovaskular','Ekstrasistol supraventrikular/ventrikular','3A'],['Kardiovaskular','Kor pulmonale akut','3B'],
+['Kardiovaskular','Kor pulmonale kronik','3A'],['Kardiovaskular','Hipertensi esensial','4A'],
+['Kardiovaskular','Hipertensi sekunder','3A'],['Kardiovaskular','Tromboflebitis','3A'],
+['Kardiovaskular','Limfangitis','3A'],['Kardiovaskular','Limfedema primer/sekunder','3A'],
+['Kardiovaskular','Insufisiensi vena kronik','3A'],
+['Respirasi','Influenza','4A'],['Respirasi','Pertusis','4A'],['Respirasi','SARS','3B'],
+['Respirasi','Flu burung','3B'],['Respirasi','Faringitis','4A'],['Respirasi','Tonsilitis','4A'],
+['Respirasi','Laringitis','4A'],['Respirasi','Asma bronkial','4A'],['Respirasi','Status asmatikus','3B'],
+['Respirasi','Bronkitis akut','4A'],['Respirasi','Bronkiolitis akut','3B'],['Respirasi','Bronkiektasis','3A'],
+['Respirasi','Pneumonia/bronkopneumonia','4A'],['Respirasi','Pneumonia aspirasi','3B'],
+['Respirasi','Tuberkulosis paru tanpa komplikasi','4A'],['Respirasi','Tuberkulosis dengan HIV','3A'],
+['Respirasi','Pneumotoraks','3A'],['Respirasi','Efusi pleura masif','3B'],
+['Respirasi','Emfisema paru','3A'],['Respirasi','PPOK eksaserbasi akut','3B'],
+['Respirasi','Edema paru','3B'],['Respirasi','Abses paru','3A'],
+['Gastrointestinal','Gastritis','4A'],['Gastrointestinal','Gastroenteritis (termasuk kolera/giardiasis)','4A'],
+['Gastrointestinal','Refluks gastroesofagus','4A'],['Gastrointestinal','Ulkus gaster/duodenum','3A'],
+['Gastrointestinal','Hernia umbilikalis','3A'],['Gastrointestinal','Peritonitis','3B'],
+['Gastrointestinal','Gastritis','4A'],['Gastrointestinal','Apendisitis akut','3B'],
+['Gastrointestinal','Abses apendiks','3B'],['Gastrointestinal','Demam tifoid','4A'],
+['Gastrointestinal','Perdarahan gastrointestinal','3B'],['Gastrointestinal','Malabsorbsi','3A'],
+['Gastrointestinal','Intoleransi makanan','4A'],['Gastrointestinal','Alergi makanan','4A'],
+['Gastrointestinal','Keracunan makanan','4A'],['Gastrointestinal','Disentri basiler/amuba','4A'],
+['Gastrointestinal','Irritable bowel syndrome','3A'],['Gastrointestinal','Proktitis','3A'],
+['Gastrointestinal','Abses perianal','3A'],['Gastrointestinal','Hemoroid derajat 1–2','4A'],
+['Gastrointestinal','Hemoroid derajat 3–4','3A'],
+['Ginjal & Urologi','Infeksi saluran kemih','4A'],['Ginjal & Urologi','Glomerulonefritis akut','3A'],
+['Ginjal & Urologi','Glomerulonefritis kronik','3A'],['Ginjal & Urologi','Gonore','4A'],
+['Ginjal & Urologi','Kolik renal','3A'],['Ginjal & Urologi','Batu saluran kemih tanpa kolik','3A'],
+['Ginjal & Urologi','Pielonefritis tanpa komplikasi','4A'],['Ginjal & Urologi','Fimosis','4A'],
+['Ginjal & Urologi','Parafimosis','4A'],['Ginjal & Urologi','Prostatitis','3A'],
+['Ginjal & Urologi','Torsio testis','3B'],['Ginjal & Urologi','Ruptur uretra','3B'],
+['Ginjal & Urologi','Ruptur kandung kencing','3B'],['Ginjal & Urologi','Ruptur ginjal','3B'],
+['Ginjal & Urologi','Priapismus','3B'],['Ginjal & Urologi','Chancroid','3A'],
+['Reproduksi & Obstetri','Infeksi traktus genital','3A'],['Reproduksi & Obstetri','Vaginosis bakterialis','4A'],
+['Reproduksi & Obstetri','Kandidiasis vulvovaginal','4A'],['Reproduksi & Obstetri','Trikomoniasis','4A'],
+['Reproduksi & Obstetri','Servisitis','3A'],['Reproduksi & Obstetri','Penyakit radang panggul','3A'],
+['Reproduksi & Obstetri','Kehamilan normal','4A'],['Reproduksi & Obstetri','Hiperemesis gravidarum','4A'],
+['Reproduksi & Obstetri','Abortus','3A'],['Reproduksi & Obstetri','Kehamilan ektopik terganggu','3B'],
+['Reproduksi & Obstetri','Preeklampsia','3B'],['Reproduksi & Obstetri','Eklampsia','3B'],
+['Reproduksi & Obstetri','Persalinan normal','4A'],['Reproduksi & Obstetri','Distosia bahu','3B'],
+['Reproduksi & Obstetri','Prolaps tali pusat','3B'],['Reproduksi & Obstetri','Hipoksia janin','3B'],
+['Reproduksi & Obstetri','Ruptur serviks','3B'],['Reproduksi & Obstetri','Ruptur perineum tingkat 1–2','4A'],
+['Reproduksi & Obstetri','Ruptur perineum tingkat 3–4','3B'],['Reproduksi & Obstetri','Retensi plasenta','3B'],
+['Reproduksi & Obstetri','Inversio uterus','3B'],['Reproduksi & Obstetri','Perdarahan postpartum','3B'],
+['Reproduksi & Obstetri','Endometritis','3B'],['Reproduksi & Obstetri','Mastitis','4A'],
+['Reproduksi & Obstetri','Cracked nipple','4A'],['Reproduksi & Obstetri','Inverted nipple','4A'],
+['Endokrin & Metabolik','Diabetes melitus tipe 1','4A'],['Endokrin & Metabolik','Diabetes melitus tipe 2','4A'],
+['Endokrin & Metabolik','Diabetes melitus tipe lain','3A'],['Endokrin & Metabolik','Hipertiroidisme','3A'],
+['Endokrin & Metabolik','Hipotiroidisme','4A'],['Endokrin & Metabolik','Tiroiditis','3A'],
+['Endokrin & Metabolik','Malnutrisi energi-protein','4A'],['Endokrin & Metabolik','Defisiensi vitamin','4A'],
+['Endokrin & Metabolik','Defisiensi mineral','4A'],['Endokrin & Metabolik','Dislipidemia','4A'],
+['Endokrin & Metabolik','Hiperurisemia','4A'],['Endokrin & Metabolik','Obesitas','4A'],
+['Endokrin & Metabolik','Sindrom metabolik','3B'],
+['Hematologi & Imunologi','Anemia defisiensi besi','4A'],['Hematologi & Imunologi','Anemia hemolitik','3A'],
+['Hematologi & Imunologi','Anemia makrositik','3A'],['Hematologi & Imunologi','Limfadenopati','3A'],
+['Hematologi & Imunologi','Limfadenitis','4A'],['Hematologi & Imunologi','Bakteremia','3B'],
+['Hematologi & Imunologi','Demam dengue/DHF','4A'],['Hematologi & Imunologi','Dengue shock syndrome','3B'],
+['Hematologi & Imunologi','Malaria','4A'],['Hematologi & Imunologi','Toksoplasmosis','3A'],
+['Hematologi & Imunologi','Leptospirosis tanpa komplikasi','4A'],['Hematologi & Imunologi','Sepsis','3B'],
+['Hematologi & Imunologi','Lupus eritematosus sistemik','3A'],['Hematologi & Imunologi','Reaksi anafilaktik','4A'],
+['Hematologi & Imunologi','Demam reumatik','3A'],['Hematologi & Imunologi','Artritis reumatoid','3A'],
+['Neurologi','Kejang demam','4A'],['Neurologi','Meningitis','3B'],['Neurologi','Ensefalitis','3B'],
+['Neurologi','Malaria serebral','3B'],['Neurologi','Tetanus','4A'],['Neurologi','Tetanus neonatorum','3B'],
+['Neurologi','HIV/AIDS tanpa komplikasi','4A'],['Neurologi','AIDS dengan komplikasi','3A'],
+['Neurologi','Poliomielitis','3B'],['Neurologi','Rabies','3B'],['Neurologi','Spondilitis TB','3A'],
+['Neurologi','Ensefalopati','3B'],['Neurologi','Koma','3B'],['Neurologi','Tension headache','4A'],
+['Neurologi','Migren','4A'],['Neurologi','Neuralgia trigeminal','3A'],['Neurologi','Cluster headache','3A'],
+['Neurologi','TIA','3B'],['Neurologi','Infark serebral','3B'],['Neurologi','Hematoma intraserebral','3B'],
+['Neurologi','Perdarahan subaraknoid','3B'],['Neurologi','Ensefalopati hipertensi','3B'],
+['Neurologi','Bell’s palsy','4A'],['Neurologi','Vertigo perifer/BPPV','4A'],['Neurologi','Demensia','3A'],
+['Neurologi','Carpal tunnel syndrome','3A'],['Neurologi','Tarsal tunnel syndrome','3A'],
+['Neurologi','Neuropati perifer','3A'],['Neurologi','Guillain-Barré syndrome','3B'],
+['Muskuloskeletal','Artritis/osteoarthritis','3A'],['Muskuloskeletal','Fraktur terbuka/tertutup','3B'],
+['Muskuloskeletal','Fraktur klavikula','3A'],['Muskuloskeletal','Osteoporosis','3A'],
+['Muskuloskeletal','Tenosinovitis supuratif','3A'],['Muskuloskeletal','Trauma sendi','3A'],
+['Muskuloskeletal','Ruptur tendon Achilles','3A'],['Muskuloskeletal','Lesi meniskus','3A'],
+['Muskuloskeletal','Ulkus pada tungkai','4A'],['Muskuloskeletal','Osteomielitis','3B'],
+['Muskuloskeletal','Lipoma','4A'],
+['Integumen','Veruka vulgaris','4A'],['Integumen','Moluskum kontagiosum','4A'],
+['Integumen','Herpes zoster tanpa komplikasi','4A'],['Integumen','Morbili tanpa komplikasi','4A'],
+['Integumen','Varisela tanpa komplikasi','4A'],['Integumen','Herpes simpleks tanpa komplikasi','4A'],
+['Integumen','Impetigo','4A'],['Integumen','Ektima','4A'],['Integumen','Folikulitis superfisialis','4A'],
+['Integumen','Furunkel/karbunkel','4A'],['Integumen','Eritrasma','4A'],['Integumen','Erisipelas','4A'],
+['Integumen','Skrofuloderma','4A'],['Integumen','Lepra','4A'],['Integumen','Reaksi lepra','3A'],
+['Integumen','Sifilis stadium 1 dan 2','4A'],['Integumen','Tinea kapitis','4A'],
+['Integumen','Tinea barbae','4A'],['Integumen','Tinea fasialis','4A'],['Integumen','Tinea korporis','4A'],
+['Integumen','Tinea manus','4A'],['Integumen','Tinea unguium','4A'],['Integumen','Tinea kruris','4A'],
+['Integumen','Tinea pedis','4A'],['Integumen','Pitiriasis versikolor','4A'],
+['Integumen','Kandidosis mukokutan ringan','4A'],['Integumen','Cutaneous larva migrans','4A'],
+['Integumen','Filariasis','4A'],['Integumen','Pedikulosis kapitis','4A'],['Integumen','Pedikulosis pubis','4A'],
+['Integumen','Skabies','4A'],['Integumen','Reaksi gigitan serangga','4A'],
+['Integumen','Dermatitis kontak iritan','4A'],['Integumen','Dermatitis kontak alergika','3A'],
+['Integumen','Dermatitis atopik','4A'],['Integumen','Dermatitis numularis','4A'],
+['Integumen','Liken simpleks kronik','3A'],['Integumen','Napkin eczema','4A'],
+['Integumen','Psoriasis vulgaris','3A'],['Integumen','Dermatitis seboroik','4A'],
+['Integumen','Pitiriasis rosea','4A'],
+['THT','Otitis eksterna','4A'],['THT','Otitis media akut','4A'],['THT','Otitis media serosa','3A'],
+['THT','Otitis media kronik','3A'],['THT','Mastoiditis','3A'],['THT','Miringitis bullosa','3A'],
+['THT','Benda asing telinga','3A'],['THT','Perforasi membran timpani','3A'],['THT','Presbiakusis','3A'],
+['THT','Serumen prop','4A'],['THT','Mabuk perjalanan','4A'],['THT','Trauma akustik akut','3A'],
+['THT','Trauma aurikular','3B'],['THT','Furunkel hidung','4A'],['THT','Rhinitis akut','4A'],
+['THT','Rhinitis vasomotor','4A'],['THT','Rhinitis alergika','4A'],['THT','Rhinitis kronik','3A'],
+['THT','Rhinitis medikamentosa','3A'],['THT','Sinusitis','3A'],['THT','Benda asing hidung','4A'],
+['THT','Epistaksis','4A'],['THT','Tortikolis','3A'],
+['Forensik','Kekerasan tumpul','4A'],['Forensik','Kekerasan tajam','4A'],
+['Forensik','Trauma kimia','3A'],['Forensik','Luka tembak','3A'],
+['Forensik','Asfiksia','3A'],['Forensik','Tenggelam','3A'],['Forensik','Kematian mendadak','3B']
+].map(([spec,name,level])=>({spec,name,level}));
+
+function renderCatalog(){
+ const spec=$('catalogSpec').value,level=$('catalogLevel').value,q=$('catalogSearch').value.toLowerCase();
+ const filtered=diseaseBank.filter(d=>(spec==='all'||d.spec===spec)&&(level==='all'||d.level===level)&&d.name.toLowerCase().includes(q));
+ $('catalogCount').textContent=filtered.length+' penyakit';
+ $('catalogList').innerHTML=filtered.map(d=>'<div class="catalog-item"><span><b>'+d.name+'</b><br><small>'+d.spec+'</small></span><span class="tag '+(d.level==='4A'?'green':'')+'">'+d.level+'</span></div>').join('');
+}
+[...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>'));
+$('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
+renderCatalog();
+
 </script></body></html>
