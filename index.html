@@ -622,7 +622,7 @@ function renderCatalog(){
  $('catalogCount').textContent=filtered.length+' penyakit • bisa dimainkan';
  $('catalogList').innerHTML=filtered.map(d=>'<button class="catalog-item" onclick="playDisease('+d.index+')" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · Klik untuk mulai simulasi</small></span><span class="tag '+(d.level==='4A'?'green':'')+'">'+d.level+'</span></button>').join('');
 }
-[...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>'));
+[...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>{$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>');$('studySpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>')});$('studySpec').onchange=renderStudyList;$('studyLevel').onchange=renderStudyList;$('studySearch').oninput=renderStudyList;
 $('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
 renderCatalog();
 
