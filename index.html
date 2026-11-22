@@ -2738,7 +2738,7 @@ function playDisease(index){
  const d=diseaseBank[index];if(!d)return;
  const c=findScenarioForDisease(d);
  if(!c){alert('Untuk diagnosis ini belum ada materi individual yang cukup untuk membangun skenario tanpa mengarang temuan.');return;}
- physicalByCase[c.id]={ku:'Tampak sakit ringan–sedang, kooperatif; sesuaikan penilaian dengan kondisi klinis.',kesadaran:'Compos mentis, GCS 15 (E4V5M6).',ttv:'TD 120/80 mmHg; nadi 88 x/menit; RR 18 x/menit; suhu 36,8°C; SpO₂ 98%. Data dasar simulasi; cari tanda vital abnormal melalui pemeriksaan terarah bila relevan.',head:'Kepala normosefal, tidak tampak trauma.',eyes:'Konjungtiva tidak pucat, sklera tidak ikterik; pupil isokor 3 mm, refleks cahaya +/+. ',ent:'Mukosa lembap; tidak ada sekret abnormal yang tampak pada pemeriksaan umum.',neck:'Tidak ada kaku kuduk; tidak teraba pembesaran kelenjar getah bening pada pemeriksaan umum.',thorax:'Gerak dada simetris, tidak ada retraksi.',cardio:'Bunyi jantung I–II reguler, tidak terdengar murmur pada pemeriksaan umum.',resp:'Suara napas vesikuler bilateral, tidak terdengar ronki atau mengi pada pemeriksaan umum.',abd:'Abdomen datar, bising usus normal, tidak ada nyeri tekan pada pemeriksaan umum.',ext:'Akral hangat, CRT <2 detik, tidak tampak edema.',neuro:'Kesadaran baik, orientasi baik, tidak tampak defisit motorik kasar pada skrining umum.',skin:'Tidak tampak ruam atau lesi spesifik pada pemeriksaan umum. Temuan khusus harus diminta sesuai fokus pemeriksaan.'};
+ applyScenarioRefinement(c);
  $('dashboard').classList.add('hidden');$('stationArea').classList.add('active','blind-mode');loadCase(c);paused=false;$('pauseTimer').textContent='Pause';window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -2850,6 +2850,121 @@ function findScenarioForDisease(d){
  return cases.find(c=>c.level===level&&normalizedDiseaseName(c.correct||c.studyName)===wanted)
    ||cases.find(c=>c.level===level&&(normalizedDiseaseName(c.correct||c.studyName).includes(wanted)||wanted.includes(normalizedDiseaseName(c.correct||c.studyName))));
 }
+
+
+/* Penyempurnaan simulasi: wawancara terarah, data pasien fiktif konsisten,
+   pemeriksaan head-to-toe, dan temuan penunjang spesifik berbasis materi. */
+function scenarioDemographics(name,system){
+ const n=(name+' '+system).toLowerCase();
+ if(/kehamil|abortus|preeklamps|eklamps|persalin|vag|serv|uter|ovari|barthol|pid|salping|mastitis|payudara|menstru|obstetri|reproduksi/.test(n))return {age:28,sex:'perempuan'};
+ if(/prostat|testis|epididim|orkitis|varikokel/.test(n))return {age:55,sex:'laki-laki'};
+ if(/neonat|bayi|kejang demam|bronkiolitis|pertusis|campak|morbili|varisela anak/.test(n))return {age:4,sex:'anak laki-laki'};
+ if(/demensia|parkinson|gagal jantung|ppok|stroke|ateroskler|katarak|presbikusis/.test(n))return {age:66,sex:'laki-laki'};
+ if(/menopause|osteoporosis post|kanker serviks|kanker payudara/.test(n))return {age:52,sex:'perempuan'};
+ return {age:42,sex:'laki-laki'};
+}
+function scenarioVitalSigns(name,level){
+ const n=name.toLowerCase();
+ if(/syok|shock|sepsis|bakteremia|anafilaks|perdarahan postpartum|ruptur|eklamps|status epileptikus|gagal napas|pneumotoraks ventil|tension/.test(n))
+  return 'TD 88/56 mmHg; nadi 126 x/menit; frekuensi napas 28 x/menit; suhu 38,2°C; SpO₂ 93% udara ruangan. Simulasi kegawatan: lakukan ABCDE dan stabilisasi segera.';
+ if(/infark miokard|angina tidak stabil|sindrom koroner|acute coronary|gagal jantung akut/.test(n))
+  return 'TD 96/64 mmHg; nadi 108 x/menit; frekuensi napas 24 x/menit; suhu 36,8°C; SpO₂ 94% udara ruangan. Nilai perfusi dan tanda kongesti.';
+ if(/asma|eksaserbasi ppok|pneumonia|pneumotoraks|efusi pleura|emboli paru/.test(n))
+  return 'TD 118/76 mmHg; nadi 112 x/menit; frekuensi napas 28 x/menit; suhu 38,0°C; SpO₂ 91% udara ruangan. Nilai derajat distres dan kerja napas.';
+ if(/dengue|malaria|leptospirosis|demam tifoid|meningitis|ensefalitis|pielonefritis|pneumonia|infeksi/.test(n))
+  return 'TD 110/70 mmHg; nadi 104 x/menit; frekuensi napas 22 x/menit; suhu 38,5°C; SpO₂ 97% udara ruangan.';
+ return 'TD 120/80 mmHg; nadi 84 x/menit; frekuensi napas 18 x/menit; suhu 36,8°C; SpO₂ 98% udara ruangan. Nilai ini merupakan data simulasi, bukan nilai rujukan.';
+}
+function scenarioSpecificResults(name){
+ const n=name.toLowerCase(),r={};
+ if(/anemia defisiensi besi/.test(n))r['Darah lengkap']='Hb 9,2 g/dL; MCV 68 fL; MCH 21 pg; RDW meningkat; ferritin 8 ng/mL.';
+ else if(/dengue|demam berdarah/.test(n))r['Darah lengkap']='Leukosit 3.800/µL; trombosit 95.000/µL; hematokrit meningkat 8% dari nilai awal. Interpretasikan tren serial dan kondisi klinis.';
+ else if(/diabetes melitus tipe 2|diabetes mellitus tipe 2/.test(n)) {r['Glukosa darah sewaktu']='GDS 248 mg/dL pada pasien dengan gejala klasik hiperglikemia.';r['HbA1c']='HbA1c 8,2%.';}
+ else if(/ketoasidosis diabetik|diabetic ketoacidosis|dka/.test(n)){r['Panel metabolik dan gas darah']='Glukosa 350 mg/dL; pH vena 7,20; HCO₃⁻ 12 mmol/L; β-hidroksibutirat meningkat; anion gap meningkat.';}
+ else if(/hiperosmolar|hhs/.test(n)){r['Panel metabolik']='Glukosa 680 mg/dL; osmolalitas efektif 324 mOsm/kg; keton minimal; pH 7,36.';}
+ else if(/infark miokard|sindrom koroner akut/.test(n)){r['EKG 12 sadapan']='Elevasi segmen ST pada sadapan yang berdekatan sesuai teritori infark. Interpretasikan sadapan dan perubahan resiprokal.';r['Troponin jantung']='Troponin meningkat di atas persentil ke-99 assay setempat; lakukan pemeriksaan serial.';}
+ else if(/pneumonia/.test(n)){r['Darah lengkap']='Leukosit 14.200/µL dengan neutrofil 82%.';r['Foto toraks']='Tampak opasitas/konsolidasi fokal pada lobus yang terkena; korelasikan dengan proyeksi dan klinis.';}
+ else if(/infeksi saluran kemih bagian bawah|sistitis|cystitis/.test(n)){r['Urinalisis']='Leukosit esterase positif; nitrit positif; leukosit urin meningkat; eritrosit 0–2/LPB.';}
+ else if(/hipertiroid|tirotoksikosis/.test(n)){r['Fungsi tiroid']='TSH tersupresi; FT4 dan/atau T3 meningkat.';}
+ else if(/hipotiroid/.test(n)){r['Fungsi tiroid']='TSH meningkat dan FT4 menurun pada hipotiroid primer.';}
+ else if(/malaria/.test(n)){r['Sediaan darah tebal-tipis']='Ditemukan parasit malaria pada pemeriksaan mikroskopis; identifikasi spesies dan parasitemia.';}
+ else if(/tuberkulosis paru/.test(n)){r['TCM sputum']='MTB terdeteksi; hasil resistansi rifampisin harus dibaca dari laporan TCM aktual.';}
+ else if(/asma/.test(n)){r['Spirometri']='Obstruksi aliran udara; respons bronkodilator bermakna mendukung variabilitas obstruksi. Interpretasikan FEV₁/FVC terhadap LLN dan perubahan FEV₁.';}
+ else if(/skabies/.test(n)){r['Kerokan kulit / dermoskopi']='Dapat terlihat tungau, telur, atau skibala; hasil negatif tidak menyingkirkan skabies bila klinis khas.';}
+ else if(/tinea/.test(n)){r['Kerokan kulit KOH 10–20%']='Tampak hifa bersepta bercabang pada sediaan positif.';}
+ return r;
+}
+function scenarioInterviewAnswers(c){
+ const name=c.correct||c.studyName||'',clinical=c.studyClinical||c.answers.penyerta||'',physical=c.studyPhysical||'',tests=c.studyTests||'',n=name.toLowerCase();
+ const risk=scenarioPlain(c.studyEducation||'').split(/(?<=[.!?])\s+/).slice(0,2).join(' ');
+ const common={
+ keluhan:c.answers.keluhan||c.intro,
+ onset:'Keluhan mulai dirasakan '+(/akut|infeksi|trauma|serangan|ruptur|perdarahan|kolik|kejang|stroke|infark/.test(n)?'sejak 1–2 hari terakhir':'secara bertahap dalam beberapa minggu terakhir')+'. Perjalanan dan progresivitasnya perlu digali lebih lanjut.',
+ penyerta:clinical||'Pasien dapat menjelaskan gejala penyerta setelah ditanyakan secara sistematis.',
+ riwayat:'Riwayat penyakit dahulu, penyakit kronis, rawat inap, operasi, riwayat keluarga, faktor risiko dan pajanan relevan digali lebih lanjut. Tidak ada riwayat tambahan yang diberikan spontan.',
+ obat:'Pasien belum menyebutkan obat yang digunakan. Tanyakan obat resep, obat bebas, suplemen, jamu, dan kepatuhan.',
+ alergi:'Pasien menyangkal alergi obat yang diketahui; tetap konfirmasi jenis obat dan bentuk reaksinya.'
+ };
+ if(/nyeri|kolik|abdomen|apendisitis|gastritis|ulkus|kolesistitis|pankreatitis|batu/.test(n))common.keluhan='Pasien mengeluhkan nyeri perut. Lokasi, penjalaran, karakter, skala, pola, faktor pencetus/peringan, BAB, BAK dan hubungan dengan makan perlu digali.';
+ if(/nyeri dada|infark|angina|jantung/.test(n))common.keluhan='Pasien mengeluhkan rasa tidak nyaman/nyeri dada. Gali lokasi, karakter, penjalaran, durasi, pencetus, peringan, sesak, keringat dingin dan sinkop.';
+ if(/sesak|asma|ppok|pneumonia|pneumotoraks|efusi|bronkitis/.test(n))common.keluhan='Pasien mengeluhkan batuk dan/atau sesak napas. Gali onset, progresivitas, mengi, sputum, hemoptisis, nyeri pleuritik dan pajanan.';
+ if(/kulit|tinea|dermatitis|urtikaria|skabies|impetigo|lepra|herpes|akne|psoriasis/.test(n))common.keluhan='Pasien mengeluhkan kelainan kulit. Gali lokasi awal, penyebaran, gatal/nyeri, perubahan lesi, kontak, obat baru dan pajanan.';
+ if(/kehamil|abortus|persalin|preeklamps|eklamps|obstetri|vaginitis|servisitis|perdarahan postpartum/.test(n))common.keluhan='Pasien perempuan datang dengan keluhan obstetri/ginekologi. Gali HPHT/usia kehamilan bila relevan, G/P/A, perdarahan, nyeri, cairan, gerak janin dan tanda bahaya.';
+ if(/sakit kepala|migren|meningitis|stroke|kejang|vertigo|neuropati|parkinson|bells/.test(n))common.keluhan='Pasien mengeluhkan sakit kepala, pusing, atau gangguan neurologis. Gali awitan, pola, defisit fokal, gangguan kesadaran, kejang, muntah dan tanda bahaya.';
+ return common;
+}
+function applyScenarioRefinement(c){
+ if(!c||!c.studyDerived)return;
+ const name=c.correct||c.studyName,dem=scenarioDemographics(name,c.studySystem||c.spec);
+ c.intro='Seorang '+dem.sex+' berusia '+dem.age+' tahun datang dengan keluhan '+(scenarioPlain(c.studyClinical||c.answers.keluhan).split(/[.;]/)[0].toLowerCase()||'yang perlu dievaluasi')+'.';
+ c.answers=scenarioInterviewAnswers(c);
+ c.mgmt=c.mgmt.map(x=>scenarioPlain(x));
+ c.findings=Object.assign({},c.findings||{},scenarioSpecificResults(name));
+ const examText=c.studyPhysical||'';
+ physicalByCase[c.id]={
+  ku:'Tampak sakit '+(c.level==='3B'?'sedang–berat':'ringan–sedang')+', kooperatif sesuai kondisi klinis.',
+  kesadaran:/koma|status epileptikus|ensefalopati|syok|meningitis|ensefalitis|stroke akut/.test(name.toLowerCase())?'Kesadaran perlu dinilai dengan GCS; jangan mengasumsikan compos mentis.':'Compos mentis, GCS 15 (E4V5M6) pada simulasi ini.',
+  ttv:scenarioVitalSigns(name,c.level),
+  head:'Kepala normosefal, tidak tampak trauma; nilai ekspresi nyeri dan tanda dehidrasi.',
+  eyes:'Konjungtiva dan sklera dinilai; pupil isokor dan refleks cahaya langsung/tidak langsung diperiksa.',
+  ent:'Mukosa mulut dan faring dinilai; periksa sekret, lesi, dan tanda dehidrasi sesuai keluhan.',
+  neck:'Nilai kelenjar getah bening, JVP, tiroid, kaku kuduk, dan deviasi trakea sesuai indikasi.',
+  thorax:'Inspeksi bentuk dan gerak dada; nilai retraksi, penggunaan otot bantu, dan ekspansi toraks.',
+  cardio:'Nilai nadi perifer, perfusi, ictus cordis, bunyi jantung, murmur, dan JVP.',
+  resp:'Auskultasi suara napas bilateral; nilai ronki, mengi, suara napas bronkial, dan suara napas menurun.',
+  abd:'Periksa abdomen secara sistematis: inspeksi, auskultasi, perkusi, palpasi; nilai nyeri tekan dan tanda peritoneal.',
+  ext:'Nilai edema, deformitas, nyeri/bengkak sendi, kekuatan, suhu akral, CRT dan nadi perifer.',
+  neuro:'Nilai GCS, pupil, saraf kranialis, motorik, sensorik, refleks, koordinasi dan tanda rangsang meningeal sesuai indikasi.',
+  skin:'Inspeksi seluruh kulit dan mukosa yang relevan; deskripsikan morfologi, distribusi, ukuran dan konfigurasi lesi.',
+  focus:examText||'Lakukan pemeriksaan fokus sesuai sistem dan keluhan utama.'
+ };
+ physicalKeysByCase[c.id]=['ku','kesadaran','ttv','head','eyes','ent','neck','thorax','cardio','resp','abd','ext','neuro','skin','focus'];
+}
+function refinedAsk(k){
+ const q=({keluhan:'Apa keluhan utama?',onset:'Sejak kapan dan bagaimana perjalanan keluhan?',penyerta:'Apakah ada gejala lain yang menyertai?',riwayat:'Apakah ada riwayat penyakit atau faktor risiko?',obat:'Obat apa yang sedang digunakan?',alergi:'Apakah ada alergi obat atau makanan?'}[k]||'Pertanyaan anamnesis');
+ const ans=current.answers[k]||'Informasi tersebut perlu digali lebih lanjut.';
+ $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+ans+'</div>');
+ $('chat').scrollTop=$('chat').scrollHeight;
+}
+function refinedFreeQuestion(){
+ const q=$('question').value.trim();if(!q)return;
+ const low=q.toLowerCase(),n=(current.correct||'').toLowerCase();
+ let k=low.includes('alerg')?'alergi':low.includes('obat')||low.includes('jamu')?'obat':low.includes('sejak')||low.includes('kapan')||low.includes('durasi')?'onset':low.includes('riwayat')||low.includes('keluarga')||low.includes('penyakit dahulu')?'riwayat':low.includes('demam')||low.includes('mual')||low.includes('muntah')||low.includes('batuk')||low.includes('sesak')||low.includes('nyeri')||low.includes('perdarahan')?'penyerta':'keluhan';
+ if(/hamil|hpht|gravida|paritas/.test(low))k='penyerta';
+ if(/rokok|merokok|alkohol|seksual|kontak|perjalanan|makanan|trauma|pencetus/.test(low))k='riwayat';
+ $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+(current.answers[k]||'Informasi tersebut perlu digali lebih lanjut pada pasien.')+'</div>');
+ $('question').value='';$('chat').scrollTop=$('chat').scrollHeight;
+}
+cases.filter(c=>c.studyDerived).forEach(applyScenarioRefinement);
+function renderScenarioNotice(){
+ if(!current||!current.studyDerived)return;
+ const brief=$('brief');
+ brief.textContent='Kasus simulasi berbasis materi belajar. Data pasien dan tanda vital adalah data fiktif untuk latihan; lakukan anamnesis, pemeriksaan head-to-toe, pilih pemeriksaan penunjang sesuai indikasi, lalu simpulkan sendiri.';
+}
+const originalLoadCase=loadCase;
+loadCase=function(c){originalLoadCase(c);renderScenarioNotice();};
+ask=refinedAsk;
+$('askBtn').onclick=refinedFreeQuestion;
 
 function renderCatalog(){
  const spec=$('catalogSpec').value,level=$('catalogLevel').value,q=$('catalogSearch').value.toLowerCase();
