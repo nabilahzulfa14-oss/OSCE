@@ -2736,20 +2736,127 @@ function makeCatalogCase(d){
 }
 function playDisease(index){
  const d=diseaseBank[index];if(!d)return;
- const curatedMap={'Asma bronkial':'asma','Infark miokard':'stemi','Kejang demam':'febrile','Pneumonia, bronkopneumonia':'pneumonia','Diabetes melitus tipe 2':'dm2','Demam dengue, DHF':'dengue','Impetigo':'impetigo','Infeksi saluran kemih':'cystitis','Anemia defisiensi besi':'ida'};
- const curatedId=curatedMap[d.name];
- const c=curatedId?cases.find(x=>x.id===curatedId&&x.level===d.level):null;
- if(!c){alert('Materi klinis dan skenario OSCE untuk penyakit ini belum selesai diverifikasi. Penyakit tetap tercantum sesuai SKDI 2012, tetapi simulasi belum dibuka agar tidak menampilkan temuan, hasil lab, atau resep generik yang berpotensi menyesatkan. Buka Mode Belajar untuk melihat status kelengkapannya.');return;}
+ const c=findScenarioForDisease(d);
+ if(!c){alert('Untuk diagnosis ini belum ada materi individual yang cukup untuk membangun skenario tanpa mengarang temuan.');return;}
  physicalByCase[c.id]={ku:'Tampak sakit ringan–sedang, kooperatif; sesuaikan penilaian dengan kondisi klinis.',kesadaran:'Compos mentis, GCS 15 (E4V5M6).',ttv:'TD 120/80 mmHg; nadi 88 x/menit; RR 18 x/menit; suhu 36,8°C; SpO₂ 98%. Data dasar simulasi; cari tanda vital abnormal melalui pemeriksaan terarah bila relevan.',head:'Kepala normosefal, tidak tampak trauma.',eyes:'Konjungtiva tidak pucat, sklera tidak ikterik; pupil isokor 3 mm, refleks cahaya +/+. ',ent:'Mukosa lembap; tidak ada sekret abnormal yang tampak pada pemeriksaan umum.',neck:'Tidak ada kaku kuduk; tidak teraba pembesaran kelenjar getah bening pada pemeriksaan umum.',thorax:'Gerak dada simetris, tidak ada retraksi.',cardio:'Bunyi jantung I–II reguler, tidak terdengar murmur pada pemeriksaan umum.',resp:'Suara napas vesikuler bilateral, tidak terdengar ronki atau mengi pada pemeriksaan umum.',abd:'Abdomen datar, bising usus normal, tidak ada nyeri tekan pada pemeriksaan umum.',ext:'Akral hangat, CRT <2 detik, tidak tampak edema.',neuro:'Kesadaran baik, orientasi baik, tidak tampak defisit motorik kasar pada skrining umum.',skin:'Tidak tampak ruam atau lesi spesifik pada pemeriksaan umum. Temuan khusus harus diminta sesuai fokus pemeriksaan.'};
  $('dashboard').classList.add('hidden');$('stationArea').classList.add('active','blind-mode');loadCase(c);paused=false;$('pauseTimer').textContent='Pause';window.scrollTo({top:0,behavior:'smooth'});
 }
+
+/* Bangun stasiun latihan dari setiap diagnosis yang sudah tersedia di Mode Belajar.
+   Temuan yang ditampilkan berasal dari materi diagnosis; tidak membuat angka lab/imaging fiktif. */
+function scenarioPlain(v){
+ return String(v||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+}
+function scenarioSection(lesson,terms){
+ const p=(lesson.sections||[]).find(x=>terms.some(t=>String(x[0]).toLowerCase().includes(t)));
+ return p?scenarioPlain(Array.isArray(p[1])?p[1].join(' '):p[1]):'';
+}
+function scenarioLevel(title){
+ const m=String(title||'').match(/^(4A|3A|3B)\s*[·–-]\s*/);
+ return m?m[1]:'';
+}
+function scenarioName(title){
+ return String(title||'').replace(/^(4A|3A|3B)\s*[·–-]\s*/,'').trim();
+}
+function scenarioSpec(label){
+ const m={
+ 'Kardiovaskular':'Cardio','Neurologi':'Neuro','Psikiatri':'Psikiatri','Indra':'Indra',
+ 'Respirasi':'Respirasi','Gastrointestinal':'Gastro','Ginjal & Saluran Kemih':'Urologi',
+ 'Reproduksi & Obstetri':'Obsgyn','Endokrin & Metabolik':'Endokrin',
+ 'Hematologi & Imunologi':'Hematologi','Muskuloskeletal':'Muskuloskeletal','Integumen':'Kulit'
+ };
+ return m[label]||label;
+}
+function makeLessonScenario(lesson,system){
+ const level=scenarioLevel(lesson.title),name=scenarioName(lesson.title);
+ if(!level||!name)return null;
+ const clinical=scenarioSection(lesson,['tanda dan gejala klinis','gejala klinis','manifestasi klinis','klinis']);
+ const physical=scenarioSection(lesson,['pemeriksaan fisik','pemeriksaan neurologis','temuan fisik','pemeriksaan status mental']);
+ const tests=scenarioSection(lesson,['pemeriksaan penunjang','pemeriksaan laboratorium','pemeriksaan diagnostik']);
+ const diff=scenarioSection(lesson,['diagnosis banding','pembeda']);
+ const treatment=scenarioSection(lesson,['tatalaksana','tata laksana','terapi']);
+ const education=scenarioSection(lesson,['edukasi','komplikasi','rujukan']);
+ const symptomText=clinical||physical||scenarioSection(lesson,['definisi'])||'Keluhan pasien perlu digali melalui anamnesis terarah.';
+ let vignette=scenarioPlain(symptomText.split(/(?<=[.!?])\s+/)[0]||symptomText);
+ vignette=vignette.replace(/^(tanda dan gejala klinis:?|manifestasi klinis:?)/i,'').trim();
+ if(!vignette||vignette.length<15||vignette.toLowerCase().includes(name.toLowerCase())) vignette='Pasien datang dengan keluhan yang perlu dievaluasi melalui anamnesis dan pemeriksaan terarah.';
+ if(vignette.length>230)vignette=vignette.slice(0,227).replace(/\s+\S*$/,'')+'…';
+ const id='lesson-'+system.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+level;
+ const findings={};
+ if(physical)findings['Pemeriksaan fisik terarah']=physical;
+ const testItems=studyBulletItems(tests).filter(x=>x.length>8);
+ testItems.forEach((item,i)=>{
+   let label=item.split(':')[0].split('—')[0].split(' – ')[0].trim();
+   if(label.length<3||label.length>54)label='Pemeriksaan penunjang '+(i+1);
+   let key=label;
+   if(findings[key])key=key+' ('+(i+1)+')';
+   findings[key]=item;
+ });
+ if(!Object.keys(findings).length)findings['Pemeriksaan terarah']=physical||clinical||'Pilih pemeriksaan sesuai temuan klinis dan indikasi.';
+ const management=studyBulletItems(treatment).filter(x=>x.length>8);
+ const mgmt=(management.length?management:level==='3B'?['Lakukan ABCDE dan stabilisasi awal sesuai kondisi','Identifikasi tanda bahaya dan kebutuhan rujukan emergensi','Komunikasikan kondisi pasien ke fasilitas rujukan','Monitor kondisi dan respons selama proses rujukan']:['Tegakkan diagnosis berdasarkan anamnesis dan pemeriksaan terarah','Pilih pemeriksaan penunjang sesuai indikasi','Tentukan tatalaksana sesuai pedoman dan kompetensi','Berikan edukasi serta rencana tindak lanjut']).slice(0,12);
+ const alternatives=studyBulletItems(diff).map(x=>x.replace(/^([^:：]+)[:：].*$/,'$1')).filter(x=>x.length>2&&!x.toLowerCase().includes('banding')).slice(0,4);
+ const answers={
+  keluhan:vignette,
+  onset:'Awitan, pola perjalanan, frekuensi, dan faktor pencetus perlu digali lebih lanjut.',
+  penyerta:clinical||'Gali gejala penyerta dan tanda bahaya sesuai keluhan utama.',
+  riwayat:'Riwayat penyakit dahulu, faktor risiko, pajanan, kontak, dan riwayat keluarga perlu digali sesuai diagnosis banding.',
+  obat:'Tanyakan seluruh obat rutin, obat bebas, jamu, dan terapi yang sudah dicoba.',
+  alergi:'Tanyakan alergi obat/makanan serta bentuk reaksi yang pernah dialami.'
+ };
+ const intro='Seorang pasien datang dengan keluhan: '+vignette.charAt(0).toLowerCase()+vignette.slice(1);
+ const c={id,title:'Kasus latihan',spec:scenarioSpec(system),level,intro,correct:name,answers,dx:[name,...alternatives],exam:Object.keys(findings),findings,mgmt,studyDerived:true,studyName:name,studySystem:system,studyPhysical:physical,studyTests:tests,studyEducation:education};
+ return c;
+}
+function collectStudyScenarios(){
+ const sets=[
+ ['Kardiovaskular',cardioLessons],['Respirasi',respiratoryLessons],['Gastrointestinal',gastroLessons],
+ ['Neurologi',neuroLessons],['Psikiatri',psychiatryLessons],['Indra',indraLessons],
+ ['Ginjal & Saluran Kemih',renalLessons],['Reproduksi & Obstetri',reproLessons],
+ ['Endokrin & Metabolik',endocrineLessons],['Hematologi & Imunologi',hematologyLessons],
+ ['Muskuloskeletal',musculoskeletalLessons]
+ ];
+ const all=[];
+ sets.forEach(([system,lessons])=>(lessons||[]).forEach(l=>{const c=makeLessonScenario(l,system);if(c)all.push(c)}));
+ (integumentRows||[]).forEach(r=>{
+   const d=integumentDetails(r),name=r.name,level=r.level;
+   const l={title:level+' · '+name,sections:[
+    ['Tanda dan gejala klinis',d[0]],['Pemeriksaan fisik dan deskripsi UKK',d[0]],
+    ['Pemeriksaan penunjang dan temuan yang mengarah ke diagnosis',d[1]],
+    ['Diagnosis banding dan pembeda',d[2]],['Tatalaksana awal dan rujukan',d[3]]
+   ]};
+   const c=makeLessonScenario(l,'Integumen');if(c)all.push(c);
+ });
+ const seen=new Set(cases.map(c=>(c.level+'|'+scenarioPlain(c.correct||c.title).toLowerCase()).replace(/\s+/g,' ')));
+ all.forEach(c=>{
+   const key=(c.level+'|'+c.correct.toLowerCase()).replace(/\s+/g,' ');
+   if(!seen.has(key)){cases.push(c);seen.add(key);}
+   if(c.studyDerived){
+     physicalByCase[c.id]={ku:c.studyPhysical||c.answers.keluhan,kesadaran:'Nilai GCS dan orientasi; data tidak diasumsikan normal sebelum diperiksa.',ttv:'Ukur TD, nadi, frekuensi napas, suhu, dan SpO₂. Nilai pasien belum diberikan pada skenario ini.'};
+     physicalKeysByCase[c.id]=['ku','kesadaran','ttv'];
+   }
+ });
+ return all.length;
+}
+const generatedStudyScenarioCount=collectStudyScenarios();
+const caseSpecSelect=$('specFilter');
+if(caseSpecSelect){
+ const known=new Set([...caseSpecSelect.options].map(o=>o.value||o.textContent));
+ [...new Set(cases.map(c=>c.spec))].forEach(v=>{if(!known.has(v))caseSpecSelect.insertAdjacentHTML('beforeend','<option>'+v+'</option>')});
+}
+function normalizedDiseaseName(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function findScenarioForDisease(d){
+ const wanted=normalizedDiseaseName(d.name),level=d.level;
+ return cases.find(c=>c.level===level&&normalizedDiseaseName(c.correct||c.studyName)===wanted)
+   ||cases.find(c=>c.level===level&&(normalizedDiseaseName(c.correct||c.studyName).includes(wanted)||wanted.includes(normalizedDiseaseName(c.correct||c.studyName))));
+}
+
 function renderCatalog(){
  const spec=$('catalogSpec').value,level=$('catalogLevel').value,q=$('catalogSearch').value.toLowerCase();
  const filtered=diseaseBank.map((d,i)=>({...d,index:i})).filter(d=>(spec==='all'||d.spec===spec)&&(level==='all'||d.level===level)&&d.name.toLowerCase().includes(q)).sort((a,b)=>({'4A':0,'3A':1,'3B':2}[a.level]??9)-({'4A':0,'3A':1,'3B':2}[b.level]??9));
- const curatedNames=new Set(['Asma bronkial','Infark miokard','Kejang demam','Pneumonia, bronkopneumonia','Diabetes melitus tipe 2','Demam dengue, DHF','Impetigo','Infeksi saluran kemih','Anemia defisiensi besi']);
- const playable=filtered.filter(d=>curatedNames.has(d.name)).length;
- $('catalogCount').textContent=filtered.length+' penyakit SKDI • '+playable+' skenario terkurasi siap dimainkan';
- $('catalogList').innerHTML=filtered.map(d=>{const ready=curatedNames.has(d.name);return '<button class="catalog-item" onclick="'+(ready?'playDisease('+d.index+')':'openStudy('+d.index+')')+'" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · '+(ready?'Skenario terkurasi — mulai latihan':'Materi klinis belum lengkap — lihat status')+'</small></span><span class="tag '+(ready?'green':'')+'">'+d.level+'</span></button>'}).join('');
+ const playable=filtered.filter(d=>!!findScenarioForDisease(d)).length;
+ $('catalogCount').textContent=filtered.length+' penyakit SKDI • '+playable+' skenario tersedia';
+ $('catalogList').innerHTML=filtered.map(d=>{const ready=!!findScenarioForDisease(d);return '<button class="catalog-item" onclick="'+(ready?'playDisease('+d.index+')':'openStudy('+d.index+')')+'" type="button"><span><b>'+d.name+'</b><br><small>'+d.spec+' · '+(ready?'Skenario tersedia — mulai latihan':'Belum ada materi belajar individual untuk skenario')+'</small></span><span class="tag '+(ready?'green':'')+'">'+d.level+'</span></button>'}).join('');
 }
 [...new Set(diseaseBank.map(d=>d.spec))].sort().forEach(s=>{$('catalogSpec').insertAdjacentHTML('beforeend','<option>'+s+'</option>')});$('studySpec').onchange=renderStudyList;
 $('catalogSpec').onchange=renderCatalog;$('catalogLevel').onchange=renderCatalog;$('catalogSearch').oninput=renderCatalog;
