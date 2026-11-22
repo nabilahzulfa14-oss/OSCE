@@ -2976,19 +2976,79 @@ function applyScenarioRefinement(c){
  };
  physicalKeysByCase[c.id]=['ku','kesadaran','ttv','head','eyes','ent','neck','thorax','cardio','resp','abd','ext','neuro','skin','focus'];
 }
+function osceEscape(value){
+ return String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function historySentences(){
+ const a=current&&current.answers||{},texts=[];
+ Object.keys(a).forEach(k=>{if(a[k])texts.push(String(a[k]));});
+ ['studyClinical','studyPhysical','studyEducation'].forEach(k=>{if(current&&current[k])texts.push(String(current[k]));});
+ return texts.join(' ').split(/(?<=[.!?])\s+|;\s+/).map(x=>x.trim()).filter(x=>x.length>12);
+}
+function historyMatch(question){
+ const q=question.toLowerCase();
+ const groups=[
+  {key:'onset',re:/sejak kapan|kapan mulai|awitan|onset|berapa lama|durasi|sudah berapa|perjalanan penyakit|makin berat|memburuk|progres/i,terms:/sejak|hari|minggu|bulan|tahun|mendadak|bertahap|progres|memburuk|membaik|hilang timbul|kambuh/i},
+  {key:'keluhan',re:/keluhan utama|apa yang dirasakan|keluhan apa|kenapa datang|apa keluhannya/i,terms:null},
+  {key:'location',re:/lokasi|letak|bagian mana|di mana|sebelah mana|menjalar ke mana/i,terms:/lokasi|kuadran|kanan|kiri|ulu hati|epigastr|perut|dada|kepala|punggung|lengan|tungkai|menjalar/i},
+  {key:'character',re:/seperti apa|karakter|sifat nyeri|rasanya bagaimana|terasa seperti|kualitas nyeri/i,terms:/tertindih|tertekan|tajam|tumpul|terbakar|panas|melilit|kolik|berdenyut|menusuk|gatal|perih|berat|sesak/i},
+  {key:'radiation',re:/menjalar|penjalaran|menyebar ke mana/i,terms:/menjalar|menyebar|lengan|rahang|punggung|bahu/i},
+  {key:'severity',re:/skala nyeri|seberapa sakit|seberapa berat|tingkat nyeri|derajat nyeri/i,terms:/skala|berat|ringan|sedang|hebat|sangat|mengganggu/i},
+  {key:'fever',re:/demam|panas badan|menggigil/i,terms:/demam|febris|panas badan|menggigil/i},
+  {key:'resp',re:/batuk|dahak|sputum|sesak|napas|mengi|hemoptisis|batuk darah/i,terms:/batuk|dahak|sputum|sesak|napas|mengi|hemoptisis|darah/i},
+  {key:'gi',re:/mual|muntah|bab|buang air besar|diare|konstipasi|sembelit|nafsu makan|kembung/i,terms:/mual|muntah|bab|diare|konstipasi|sembelit|nafsu makan|kembung|darah pada tinja/i},
+  {key:'urinary',re:/bak|buang air kecil|kencing|urin|anyang|nyeri saat kencing|hematuria/i,terms:/bak|buang air kecil|kencing|urin|anyang|disuria|hematuria/i},
+  {key:'skin',re:/gatal|ruam|bercak|bintil|lepuh|luka|kulit|lesi/i,terms:/gatal|ruam|bercak|papul|vesikel|lepuh|luka|kulit|lesi|kemerahan/i},
+  {key:'neuro',re:/pusing|sakit kepala|kejang|pingsan|kesemutan|lemah|baal|penglihatan|bicara/i,terms:/pusing|sakit kepala|kejang|pingsan|kesemutan|lemah|baal|penglihatan|bicara|kelemahan/i},
+  {key:'obgyn',re:/hpht|haid|menstruasi|hamil|kehamilan|usia kandungan|gerak janin|perdarahan vagina|keputihan|persalinan/i,terms:/hpht|haid|menstruasi|hamil|kehamilan|gravida|paritas|janin|perdarahan|keputihan|persalinan|kontraksi/i},
+  {key:'trigger',re:/pencetus|memperberat|memicu|setelah apa|aktivitas|makanan tertentu/i,terms:/pencetus|dipicu|setelah|aktivitas|makanan|debu|dingin|posisi|berbaring|berjalan/i},
+  {key:'relief',re:/meringankan|mengurangi|membaik kalau|apa yang membuat.*membaik/i,terms:/membaik|berkurang|mereda|istirahat|obat|duduk|membungkuk/i},
+  {key:'past',re:/riwayat penyakit dahulu|pernah sakit|penyakit sebelumnya|rawat inap|operasi|komorbid/i,terms:/riwayat|pernah|hipertensi|diabetes|asma|jantung|ginjal|operasi|rawat inap/i},
+  {key:'family',re:/riwayat keluarga|keluarga.*sakit|keturunan/i,terms:/keluarga|keturunan|orang tua|saudara/i},
+  {key:'social',re:/merokok|rokok|alkohol|pekerjaan|pekerjaan|aktivitas sehari|hubungan seksual|narkoba|perjalanan|kontak/i,terms:/rokok|merokok|alkohol|pekerjaan|seksual|narkoba|perjalanan|kontak|pajanan/i}
+ ];
+ return groups.find(g=>g.re.test(q))||null;
+}
+function answerPatientQuestion(question){
+ const q=question.toLowerCase(),a=current&&current.answers||{};
+ const direct=[
+  {re:/alerg/i,key:'alergi',label:'alergi'},
+  {re:/obat|jamu|suplemen|terapi|inhaler/i,key:'obat',label:'obat yang digunakan'},
+  {re:/riwayat|penyakit dahulu|operasi|rawat inap|komorbid|keluarga|keturunan|rokok|merokok|alkohol|pekerjaan|seksual|narkoba|perjalanan|kontak|pajanan/i,key:'riwayat',label:'riwayat'},
+  {re:/sejak kapan|kapan mulai|awitan|onset|berapa lama|durasi|perjalanan penyakit/i,key:'onset',label:'awitan keluhan'},
+  {re:/gejala penyerta|keluhan lain|gejala lain|disertai apa|apa lagi yang dirasakan/i,key:'penyerta',label:'gejala penyerta'},
+  {re:/keluhan utama|apa keluhan|apa yang dirasakan|kenapa datang/i,key:'keluhan',label:'keluhan utama'}
+ ];
+ const d=direct.find(x=>x.re.test(q));
+ if(d&&a[d.key])return a[d.key];
+ const match=historyMatch(question);
+ if(match){
+  const sentences=historySentences();
+  const found=sentences.filter(s=>match.terms&&match.terms.test(s));
+  if(found.length)return found.slice(0,2).join(' ');
+  if(match.key==='onset'&&a.onset)return a.onset;
+  if(match.key==='keluhan'&&a.keluhan)return a.keluhan;
+  if(match.key==='past'&&a.riwayat)return a.riwayat;
+  if(match.key==='family'&&a.riwayat)return 'Pasien belum memberikan informasi khusus mengenai riwayat penyakit keluarga. Riwayat ini perlu ditanyakan lebih lanjut.';
+  if(match.key==='social'&&a.riwayat)return a.riwayat;
+  if(match.key==='trigger'||match.key==='relief')return 'Pasien belum dapat menjelaskan faktor pencetus atau peringan secara spesifik. Hal ini perlu digali lebih lanjut.';
+  return 'Pasien belum memberikan informasi spesifik mengenai hal tersebut. Silakan gali lebih lanjut; saya tidak akan mengasumsikan jawabannya.';
+ }
+ if(/bab|buang air besar|diare|konstipasi|sembelit|mual|muntah/.test(q)&&a.penyerta)return a.penyerta;
+ if(/hamil|hpht|haid|menstruasi|gravida|paritas|gerak janin|kontraksi|keputihan/.test(q)&&a.penyerta)return a.penyerta;
+ if(/keluhan|rasanya|dirasakan|apa yang terjadi/.test(q)&&a.keluhan)return a.keluhan;
+ return 'Maaf, pasien belum memberikan informasi itu. Coba tanyakan lebih spesifik, misalnya kapan mulai, lokasi, karakter, gejala penyerta, faktor pencetus, riwayat penyakit, obat, atau alergi.';
+}
 function refinedAsk(k){
- const q=({keluhan:'Apa keluhan utama?',onset:'Sejak kapan dan bagaimana perjalanan keluhan?',penyerta:'Apakah ada gejala lain yang menyertai?',riwayat:'Apakah ada riwayat penyakit atau faktor risiko?',obat:'Obat apa yang sedang digunakan?',alergi:'Apakah ada alergi obat atau makanan?'}[k]||'Pertanyaan anamnesis');
- const ans=current.answers[k]||'Informasi tersebut perlu digali lebih lanjut.';
- $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+ans+'</div>');
+ const q=({keluhan:'Apa keluhan utama?',onset:'Sejak kapan keluhan dirasakan dan bagaimana perkembangannya?',penyerta:'Apakah ada gejala lain yang menyertai?',riwayat:'Apakah ada riwayat penyakit dahulu, operasi, atau faktor risiko?',obat:'Obat apa saja yang sedang atau pernah digunakan?',alergi:'Apakah ada alergi obat atau makanan?'}[k]||'Pertanyaan anamnesis');
+ const ans=current.answers[k]||'Pasien belum memberikan informasi tersebut. Perlu digali lebih lanjut.';
+ $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+osceEscape(q)+'</div><div class="bubble patient">'+osceEscape(ans)+'</div>');
  $('chat').scrollTop=$('chat').scrollHeight;
 }
 function refinedFreeQuestion(){
  const q=$('question').value.trim();if(!q)return;
- const low=q.toLowerCase(),n=(current.correct||'').toLowerCase();
- let k=low.includes('alerg')?'alergi':low.includes('obat')||low.includes('jamu')?'obat':low.includes('sejak')||low.includes('kapan')||low.includes('durasi')?'onset':low.includes('riwayat')||low.includes('keluarga')||low.includes('penyakit dahulu')?'riwayat':low.includes('demam')||low.includes('mual')||low.includes('muntah')||low.includes('batuk')||low.includes('sesak')||low.includes('nyeri')||low.includes('perdarahan')?'penyerta':'keluhan';
- if(/hamil|hpht|gravida|paritas/.test(low))k='penyerta';
- if(/rokok|merokok|alkohol|seksual|kontak|perjalanan|makanan|trauma|pencetus/.test(low))k='riwayat';
- $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+q+'</div><div class="bubble patient">'+(current.answers[k]||'Informasi tersebut perlu digali lebih lanjut pada pasien.')+'</div>');
+ const ans=answerPatientQuestion(q);
+ $('chat').insertAdjacentHTML('beforeend','<div class="bubble doctor">'+osceEscape(q)+'</div><div class="bubble patient">'+osceEscape(ans)+'</div>');
  $('question').value='';$('chat').scrollTop=$('chat').scrollHeight;
 }
 cases.filter(c=>c.studyDerived).forEach(applyScenarioRefinement);
