@@ -2853,7 +2853,7 @@ const forensicScenarioBank=[
 {id:'forensic-toxicology',spec:'Forensik',level:'3A',correct:'Toksikologi forensik',intro:'Seorang laki-laki berusia 19 tahun dibawa ke IGD dalam keadaan mengantuk setelah diduga menelan sejumlah tablet milik anggota keluarganya.',answers:{keluhan:'Pasien mengantuk, mual, dan sulit diajak berkomunikasi.',onset:'Keluarga memperkirakan obat tertelan satu hingga dua jam sebelum tiba; jumlah dan jenis belum diketahui.',penyerta:'Ada muntah satu kali; tanyakan kejang, gangguan napas, nyeri perut, gangguan penglihatan, dan perubahan perilaku.',riwayat:'Gali jenis zat, jumlah, waktu, rute, kemasan, kemungkinan campuran alkohol/zat lain, penyakit hati/ginjal, dan niat; jangan menunda stabilisasi.',obat:'Keluarga membawa satu kemasan obat kosong yang perlu diidentifikasi.',alergi:'Belum dapat dikonfirmasi.'},dx:['Toksikologi forensik','Hipoglikemia','Intoksikasi alkohol/zat psikoaktif'],findings:{'Pemeriksaan awal':'GCS 12; RR 10 x/menit; TD 110/70 mmHg; nadi 96 x/menit; SpO₂ 91%. Periksa glukosa bedside segera dan amankan jalan napas.','Glukosa bedside':'54 mg/dL; koreksi hipoglikemia segera sesuai protokol.','Pemeriksaan toksikologi':'Sampel darah/urin diambil dan diberi label waktu, identitas, jenis sampel, petugas pengambil, segel dan dokumentasi rantai penguasaan bukti. Hasil toksikologi tidak boleh menunda terapi.'},mgmt:['ABCDE dan amankan jalan napas, ventilasi, sirkulasi; ukur glukosa bedside segera','Identifikasi kemungkinan toksidrom dan zat, tetapi jangan menunda stabilisasi untuk menunggu hasil','Konsultasi pusat informasi keracunan/ahli toksikologi dan berikan antidotum bila ada indikasi','Ambil sampel darah/urin sesuai indikasi, beri label dan segel serta catat rantai penguasaan bukti','Jangan melakukan induksi muntah; arang aktif hanya pada indikasi, waktu dan kondisi jalan napas yang tepat','Monitor EKG, kesadaran, tanda vital, glukosa, elektrolit dan komplikasi; rujuk ICU bila diperlukan','Dokumentasikan sumber informasi, kemasan zat, waktu paparan, intervensi dan respons'] }
 ];
 for(const c of forensicScenarioBank){
- c.title='Kasus latihan';c.studyDerived=false;
+ c.title='Kasus latihan';c.studyDerived=false;c.forensicCase=true;
  cases.push(c);
  physicalByCase[c.id]={
   ku:'Tampak sakit sesuai mekanisme cedera dan kondisi saat datang; lakukan penilaian ABCDE.',
@@ -3025,8 +3025,13 @@ function refinedEvaluate(){
 $('finish').onclick=refinedEvaluate;
 
 function renderScenarioNotice(){
- if(!current||!current.studyDerived)return;
+ if(!current)return;
  const brief=$('brief');
+ if(current.forensicCase){
+  brief.textContent='Kasus forensik simulasi. Data pasien bersifat fiktif; utamakan penyelamatan nyawa, dokumentasi objektif, persetujuan/privasi, dan prosedur hukum yang berlaku. Jangan menyimpulkan aspek hukum di luar kewenangan.';
+  return;
+ }
+ if(!current.studyDerived)return;
  brief.textContent='Kasus simulasi berbasis materi belajar. Data pasien dan tanda vital adalah data fiktif untuk latihan; lakukan anamnesis, pemeriksaan head-to-toe, pilih pemeriksaan penunjang sesuai indikasi, lalu simpulkan sendiri.';
 }
 const originalLoadCase=loadCase;
