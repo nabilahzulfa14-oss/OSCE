@@ -175,7 +175,7 @@ const physicalByCase={
  pneumonia:{ku:'Tampak sakit sedang, sesak ringan.',kesadaran:'Compos mentis.',ttv:'TD 110/70 mmHg; nadi 108 x/menit; RR 26 x/menit; suhu 38,5°C; SpO₂ 93%.',head:'Kepala normosefal.',eyes:'Konjungtiva tidak pucat.',ent:'Evaluasi faring dan mukosa.',neck:'Evaluasi penggunaan otot bantu dan limfadenopati.',thorax:'Takipnea ringan; fremitus meningkat dan perkusi redup basal kanan.',cardio:'Nilai frekuensi dan irama jantung.',resp:'Krepitasi basal kanan.',abd:'Tidak ada temuan khusus.',ext:'Nilai sianosis dan perfusi.',neuro:'Compos mentis.',skin:'Kulit hangat; tidak tampak sianosis sentral, tanpa ruam.'},
  anemia:{ku:'Tampak lemah.',kesadaran:'Compos mentis.',ttv:'TD 110/70 mmHg; nadi 96 x/menit; RR 20 x/menit; suhu 36,7°C; SpO₂ 99%.',head:'Kepala normosefal.',eyes:'Konjungtiva pucat.',ent:'Mukosa mulut dapat tampak pucat.',neck:'Tidak ada temuan khusus.',thorax:'Bunyi jantung reguler, tidak terdengar murmur; tidak ada tanda gagal jantung.',cardio:'Takikardia ringan; dapat terdengar bising aliran sistolik fungsional.',resp:'Auskultasi paru.',abd:'Tidak teraba hepatosplenomegali.',ext:'Kuku rapuh; nilai koilonychia.',neuro:'Compos mentis.',skin:'Kulit dan dasar kuku tampak pucat; kuku agak rapuh.'}
 };
-const physicalSections=[['ku','Keadaan umum'],['kesadaran','Kesadaran'],['ttv','Tanda-tanda vital'],['head','Kepala/wajah'],['eyes','Mata'],['ent','THT dan rongga mulut'],['neck','Leher'],['thorax','Dinding dada'],['cardio','Jantung dan sirkulasi'],['resp','Paru'],['abd','Abdomen'],['ext','Ekstremitas'],['neuro','Neurologis'],['skin','Kulit']];
+const physicalSections=[['ku','Keadaan umum'],['kesadaran','Kesadaran'],['ttv','Tanda-tanda vital'],['head','Kepala/wajah'],['eyes','Mata'],['ent','THT dan rongga mulut'],['neck','Leher'],['thorax','Dinding dada'],['cardio','Jantung dan sirkulasi'],['resp','Paru'],['abd','Abdomen'],['ext','Ekstremitas'],['neuro','Neurologis'],['skin','Kulit'],['focus','Pemeriksaan fokus sesuai diagnosis']];
 // Pemeriksaan fisik ditampilkan secara terarah per kasus, bukan head-to-toe otomatis.
 const physicalKeysByCase={
  stemi:['ku','kesadaran','ttv','neck','thorax','cardio','resp','ext','skin'],
@@ -2805,7 +2805,7 @@ function makeLessonScenario(lesson,system){
   alergi:'Tanyakan alergi obat/makanan serta bentuk reaksi yang pernah dialami.'
  };
  const intro='Seorang pasien datang dengan keluhan: '+vignette.charAt(0).toLowerCase()+vignette.slice(1);
- const c={id,title:'Kasus latihan',spec:scenarioSpec(system),level,intro,correct:name,answers,dx:[name,...alternatives],exam:Object.keys(findings),findings,mgmt,studyDerived:true,studyName:name,studySystem:system,studyPhysical:physical,studyTests:tests,studyEducation:education};
+ const c={id,title:'Kasus latihan',spec:scenarioSpec(system),level,intro,correct:name,answers,dx:[name,...alternatives],exam:Object.keys(findings),findings,mgmt,studyDerived:true,studyName:name,studySystem:system,studyClinical:clinical,studyPhysical:physical,studyTests:tests,studyEducation:education};
  return c;
 }
 function collectStudyScenarios(){
@@ -2956,6 +2956,38 @@ function refinedFreeQuestion(){
  $('question').value='';$('chat').scrollTop=$('chat').scrollHeight;
 }
 cases.filter(c=>c.studyDerived).forEach(applyScenarioRefinement);
+
+function refinedEvaluate(){
+ const dx=$('diagnosis').value.trim(),ddx=$('ddx').value.trim(),reason=$('reasoning').value.trim(),rx=$('prescription').value.trim(),edu=$('education').value.trim();
+ const norm=normalizedDiseaseName(dx),target=normalizedDiseaseName(current.correct);
+ const correct=!!norm&&(norm===target||norm.includes(target)||target.includes(norm));
+ const ddxExpected=(current.dx||[]).slice(1);
+ const ddxCorrect=ddxExpected.length?ddxExpected.some(x=>normalizedDiseaseName(ddx).includes(normalizedDiseaseName(x))):!!ddx;
+ const selected=[...document.querySelectorAll('#managementChecks input:checked')].map(x=>+x.value);
+ const mgmtScore=current.mgmt.length?Math.round(selected.length/current.mgmt.length*15):0;
+ const physicalCount=document.querySelectorAll('#physicalChecks input:checked').length;
+ const interpreted=[...document.querySelectorAll('#examResult textarea')].filter(t=>t.value.trim().length>10);
+ const hasExam=document.querySelectorAll('#examResult .exam-card').length>0;
+ const parts=[
+  ['Diagnosis kerja',correct?30:0,30],
+  ['Alasan klinis',reason.length>=35?10:reason.length>=10?5:0,10],
+  ['Diagnosis banding',ddxCorrect?10:ddx?5:0,10],
+  ['Pemeriksaan fisik',physicalCount>=6?10:physicalCount>=3?6:physicalCount>0?3:0,10],
+  ['Pemeriksaan penunjang dan interpretasi',interpreted.length>=2?15:interpreted.length===1?10:hasExam?5:0,15],
+  ['Tatalaksana',mgmtScore,15],
+  ['Resep/instruksi terapi',rx.length>=25?5:rx.length?2:0,5],
+  ['Edukasi dan follow-up',edu.length>=25?5:edu.length?2:0,5]
+ ];
+ const score=parts.reduce((a,x)=>a+x[1],0);
+ $('score').textContent=score+'/100';
+ const resultRows=parts.map(x=>'<tr><td>'+x[0]+'</td><td>'+x[1]+' / '+x[2]+'</td></tr>').join('');
+ const differential=ddxExpected.length?'<p><b>Diagnosis banding yang perlu dipertimbangkan:</b> '+ddxExpected.join('; ')+'</p>':'';
+ const examFeedback=[...document.querySelectorAll('#examResult textarea')].map(t=>'<li><b>'+t.dataset.exam+':</b> '+(t.value||'Belum diinterpretasikan')+'</li>').join('');
+ $('feedback').innerHTML='<p><b>Diagnosis rujukan:</b> '+current.correct+'</p><p><b>Diagnosis kamu:</b> '+(dx||'Belum diisi')+'</p>'+differential+'<div class="table-wrap"><table><thead><tr><th>Komponen</th><th>Skor</th></tr></thead><tbody>'+resultRows+'</tbody></table></div><p><b>Interpretasi penunjang yang kamu tulis:</b></p><ul>'+examFeedback+'</ul><p><b>Tatalaksana dipilih:</b> '+selected.length+' dari '+current.mgmt.length+' langkah.</p><div class="result">'+(correct?'Diagnosis kerja tepat.':'Tinjau kembali diagnosis dan cocokkan dengan petunjuk klinis.')+' Total skor latihan '+score+'/100. Penilaian otomatis ini bersifat formatif, bukan penilaian OSCE tervalidasi.</div><p class="muted">Skor menilai kelengkapan isian dan kecocokan diagnosis secara sederhana. Ketepatan klinis, dosis, kontraindikasi, komunikasi, dan keselamatan pasien tetap perlu dinilai oleh penguji/dosen.</p>';
+ $('evaluation').classList.remove('hidden');$('evaluation').scrollIntoView({behavior:'smooth'});
+}
+$('finish').onclick=refinedEvaluate;
+
 function renderScenarioNotice(){
  if(!current||!current.studyDerived)return;
  const brief=$('brief');
